@@ -3,526 +3,293 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Evolución Guardias — Ene 2025 · Feb 2026</title>
+<title>Evolución Guardias — Últimos 6 Meses</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0b0e14; --surface:#131720; --surface2:#1a1f2e; --surface3:#1e2535;
-  --border:#252d3d; --border2:#2e3850;
-  --accent:#4fffb0; --accent-dim:rgba(79,255,176,.12);
-  --red:#ff6b6b; --red-dim:rgba(255,107,107,.12);
-  --yellow:#f7c948; --purple:#a78bfa;
-  --text:#e8eaf0; --muted:#6b7494; --muted2:#4a5270;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  :root {
+    --bg: #0d0f14;
+    --panel: #13161e;
+    --border: #1f2330;
+    --accent: #e8c547;
+    --accent2: #4fd1c5;
+    --red: #f56565;
+    --green: #68d391;
+    --text: #e2e8f0;
+    --muted: #718096;
+    --card: #181b25;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
 
-/* ── HEADER ── */
-header{padding:28px 36px 20px;border-bottom:1px solid var(--border);background:linear-gradient(160deg,#0d1220 0%,var(--bg) 100%);display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.hd-title h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
-.hd-title h1 em{color:var(--accent);font-style:normal}
-.hd-title p{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;letter-spacing:.4px}
-.hd-stats{display:flex;gap:20px;flex-wrap:wrap}
-.hs{text-align:right}
-.hs-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent)}
-.hs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+  header {
+    background: linear-gradient(135deg, #13161e 0%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header h1 { font-family:'Bebas Neue'; font-size:2.2rem; letter-spacing:3px; color:var(--accent); }
+  header p { color:var(--muted); font-size:.85rem; margin-top:2px; }
+  .badge { background:var(--accent); color:#000; font-size:.7rem; font-weight:600; padding:4px 10px; border-radius:20px; letter-spacing:1px; }
 
-/* ── VIEW TOGGLE ── */
-.view-bar{padding:14px 36px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.vbtn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.6px}
-.vbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
-.vbtn.active{background:var(--accent);color:#0b0e14;border-color:var(--accent)}
-.vbtn:not(.active):hover{border-color:var(--accent);color:var(--accent)}
-.vbar-sep{width:1px;height:28px;background:var(--border);margin:0 4px}
+  .controls {
+    padding: 20px 40px;
+    display: flex; flex-wrap:wrap; gap:12px; align-items:center;
+    border-bottom:1px solid var(--border);
+  }
+  .search-box {
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:8px 14px; color:var(--text); font-size:.85rem; font-family:'DM Sans';
+    outline:none; width:280px; transition:.2s;
+  }
+  .search-box:focus { border-color:var(--accent); }
+  .search-box::placeholder { color:var(--muted); }
 
-/* ── CONTROLS ── */
-.controls{padding:16px 36px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2)}
-.ctrl-group{display:flex;flex-direction:column;gap:6px}
-.ctrl-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-family:'DM Mono',monospace}
+  .filter-btn {
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:8px 14px; border-radius:8px; cursor:pointer; font-family:'DM Sans'; font-size:.8rem;
+    transition:.2s; white-space:nowrap;
+  }
+  .filter-btn:hover, .filter-btn.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:600; }
 
-/* search */
-.search-wrap{position:relative}
-.search-wrap input{width:260px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 34px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border-color .2s}
-.search-wrap input:focus{border-color:var(--accent)}
-.search-wrap::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px}
+  .sort-label { color:var(--muted); font-size:.8rem; margin-left:8px; }
+  select.sort-select {
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    padding:8px 12px; border-radius:8px; font-family:'DM Sans'; font-size:.8rem; outline:none; cursor:pointer;
+  }
 
-/* month pills */
-.month-pills{display:flex;gap:4px;flex-wrap:wrap;max-width:760px}
-.mpill{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .12s;white-space:nowrap;user-select:none}
-.mpill:hover{border-color:var(--accent);color:var(--accent)}
-.mpill.active{background:var(--accent);color:#0b0e14;border-color:var(--accent)}
-.mpill.pill-all{font-weight:700}
+  .stats-bar {
+    display:flex; gap:0; border-bottom:1px solid var(--border);
+    overflow-x:auto;
+  }
+  .stat { padding:16px 32px; border-right:1px solid var(--border); min-width:160px; }
+  .stat .val { font-family:'Bebas Neue'; font-size:1.8rem; color:var(--accent); letter-spacing:1px; }
+  .stat .lbl { font-size:.72rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
 
-/* filter + sort row */
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fbtn{padding:6px 13px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:11px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all .12s;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px}
-.fbtn:hover{border-color:var(--accent);color:var(--accent)}
-.fbtn.fa{background:var(--accent);color:#0b0e14;border-color:var(--accent)}
-.fbtn.fu{background:rgba(79,255,176,.15);color:var(--accent);border-color:rgba(79,255,176,.3)}
-.fbtn.fd{background:rgba(255,107,107,.15);color:var(--red);border-color:rgba(255,107,107,.3)}
-select.sort-sel{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;padding:7px 11px;outline:none;cursor:pointer;margin-left:auto}
+  .grid {
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap:16px; padding:24px 40px;
+  }
 
-/* ── CONTENT ── */
-.content{padding:20px 36px 48px}
-.rcount{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px}
-.rcount span{color:var(--accent)}
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:20px; transition:.25s; cursor:pointer; position:relative; overflow:hidden;
+  }
+  .card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,.4); }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .card.up::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .card.down::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .card.neutral::before { background: linear-gradient(90deg, var(--muted), transparent); }
 
-/* ══ CARDS VIEW ══ */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(580px,1fr));gap:14px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s}
-.card:hover{border-color:var(--border2);transform:translateY(-1px)}
-.card.expanded{border-color:var(--accent)}
-.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:10px}
-.card-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{font-family:'DM Mono',monospace;font-size:12px;padding:3px 9px;border-radius:5px;white-space:nowrap}
-.b-up{background:rgba(79,255,176,.1);color:var(--accent);border:1px solid rgba(79,255,176,.2)}
-.b-down{background:rgba(255,107,107,.1);color:var(--red);border:1px solid rgba(255,107,107,.2)}
-.b-neutral{background:rgba(107,116,148,.1);color:var(--muted);border:1px solid rgba(107,116,148,.2)}
+  .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .card-name { font-size:.9rem; font-weight:600; color:var(--text); line-height:1.3; max-width:260px; }
+  .var-badge {
+    font-size:.75rem; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; margin-left:8px;
+  }
+  .var-badge.up { background:rgba(104,211,145,.15); color:var(--green); }
+  .var-badge.down { background:rgba(245,101,101,.15); color:var(--red); }
+  .var-badge.neutral { background:rgba(113,128,150,.15); color:var(--muted); }
 
-/* sparkline row */
-.card-spark{display:flex;padding:0 18px;overflow-x:auto;scrollbar-width:none}
-.card-spark::-webkit-scrollbar{display:none}
-.sp-cell{flex:1;min-width:66px;padding:7px 4px 12px;text-align:center;border-top:1px solid var(--border);position:relative}
-.sp-lbl{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;white-space:nowrap}
-.sp-htt{font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);margin-bottom:1px}
-.sp-ing{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
-.sp-cell.empty{opacity:.2}
-.bar-bg{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--border)}
-.bar-fill{height:100%;border-radius:2px}
+  .mini-stats { display:flex; gap:20px; margin-bottom:14px; }
+  .mini-stat .ms-val { font-size:.85rem; font-weight:600; color:var(--accent2); }
+  .mini-stat .ms-lbl { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
 
-/* expanded detail */
-.card-detail{display:none;border-top:1px solid var(--border);background:var(--surface2);padding:14px 18px 18px}
-.card.expanded .card-detail{display:block}
-.det-tabs{display:flex;gap:5px;margin-bottom:10px}
-.dtab{padding:4px 11px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;transition:all .12s;text-transform:uppercase;letter-spacing:.5px}
-.dtab.active{background:var(--accent);color:#0b0e14;border-color:var(--accent)}
-.det-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px}
-.dstat{background:var(--surface);padding:9px 12px;text-align:center}
-.dstat-val{font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent)}
-.dstat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
-.chart-wrap{height:150px;position:relative}
+  .chart-wrap { position:relative; height:110px; }
 
-/* ══ TABLE VIEW ══ */
-#table-view{display:none}
-.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12px;min-width:700px}
-thead tr{background:var(--surface2);border-bottom:2px solid var(--border)}
-thead th{padding:10px 14px;text-align:right;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
-thead th:first-child{text-align:left}
-thead th:hover{color:var(--accent)}
-thead th.sort-asc::after{content:' ▲';color:var(--accent)}
-thead th.sort-desc::after{content:' ▼';color:var(--accent)}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
-tbody tr:hover{background:var(--surface2)}
-tbody tr:last-child{border-bottom:none}
-td{padding:9px 14px;text-align:right;color:var(--text);vertical-align:middle}
-td:first-child{text-align:left;color:var(--text);font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-td.td-mes{color:var(--muted);font-size:11px}
-.td-var{font-weight:700}
-.td-var.up{color:var(--accent)}
-.td-var.down{color:var(--red)}
-.td-neto{color:var(--yellow);font-weight:600}
-tfoot td{background:var(--surface2);padding:10px 14px;color:var(--accent);font-weight:700;border-top:2px solid var(--border)}
-tfoot td:first-child{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:100;
+    align-items:center; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--panel); border:1px solid var(--border); border-radius:16px;
+    width:720px; max-width:95vw; padding:32px; position:relative;
+  }
+  .modal-close {
+    position:absolute; top:16px; right:16px; background:none; border:none;
+    color:var(--muted); font-size:1.4rem; cursor:pointer;
+  }
+  .modal-close:hover { color:var(--text); }
+  .modal h2 { font-family:'Bebas Neue'; font-size:1.5rem; letter-spacing:2px; color:var(--accent); margin-bottom:4px; }
+  .modal-chart-wrap { height:220px; margin:20px 0; }
+  .detail-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  .detail-table th { color:var(--muted); text-align:right; padding:6px 10px; font-weight:500; border-bottom:1px solid var(--border); }
+  .detail-table th:first-child { text-align:left; }
+  .detail-table td { text-align:right; padding:6px 10px; border-bottom:1px solid var(--border); }
+  .detail-table td:first-child { text-align:left; color:var(--accent2); font-weight:500; }
+  .detail-table tr:last-child td { border-bottom:none; }
+  .detail-table .null-val { color:var(--muted); font-style:italic; }
 
-/* empty */
-.empty-msg{text-align:center;padding:48px;color:var(--muted);font-size:13px}
+  .empty { text-align:center; padding:60px; color:var(--muted); font-size:1rem; grid-column:1/-1; }
 
-/* responsive */
-@media(max-width:660px){
-  header,.controls,.content,.view-bar{padding-left:14px;padding-right:14px}
-  .cards-grid{grid-template-columns:1fr}
-  .hd-stats{display:none}
-  .det-stats{grid-template-columns:repeat(2,1fr)}
-}
+  @media(max-width:600px){
+    header { padding:16px 20px; }
+    .controls, .grid { padding:16px 20px; }
+    .grid { grid-template-columns:1fr; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="hd-title">
-    <h1>Evolución <em>Guardias</em></h1>
-    <p>ENERO 2025 — FEBRERO 2026 &nbsp;·&nbsp; 14 meses · datos completos</p>
+  <div>
+    <h1>Evolución de Guardias</h1>
+    <p>Horas Totales e Ingresos — Últimos 6 meses</p>
   </div>
-  <div class="hd-stats">
-    <div class="hs"><div class="hs-val" id="s-total">55</div><div class="hs-lbl">Guardias</div></div>
-    <div class="hs"><div class="hs-val" id="s-up">—</div><div class="hs-lbl">Con alza</div></div>
-    <div class="hs"><div class="hs-val" id="s-down">—</div><div class="hs-lbl">Con baja</div></div>
-    <div class="hs"><div class="hs-val" id="s-ing">—</div><div class="hs-lbl">Total ing. período</div></div>
-  </div>
+  <span class="badge">SEP 2025 → FEB 2026</span>
 </header>
 
-<!-- VIEW TOGGLE -->
-<div class="view-bar">
-  <button class="vbtn active" id="btn-cards" onclick="switchView('cards')">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    Tarjetas
-  </button>
-  <button class="vbtn" id="btn-table" onclick="switchView('table')">
-    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    Resumen tabla
-  </button>
-  <div class="vbar-sep"></div>
-  <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace" id="sel-info">Todos los meses seleccionados</span>
-</div>
+<div class="stats-bar" id="statsBar"></div>
 
-<!-- CONTROLS -->
 <div class="controls">
-  <!-- Month pills -->
-  <div class="ctrl-group" style="flex:1;min-width:280px">
-    <div class="ctrl-label">Filtrar por mes</div>
-    <div class="month-pills" id="month-pills"></div>
-  </div>
-  <!-- Search + filters -->
-  <div class="ctrl-group">
-    <div class="ctrl-label">Buscar guardia</div>
-    <div class="search-wrap"><input type="text" id="search" placeholder="Nombre..." oninput="render()"></div>
-  </div>
-  <div class="ctrl-group">
-    <div class="ctrl-label">Filtro variación</div>
-    <div class="filter-row">
-      <button class="fbtn fa" onclick="setFilter('all',this)">Todos</button>
-      <button class="fbtn" onclick="setFilter('up',this)">▲ Alza</button>
-      <button class="fbtn" onclick="setFilter('down',this)">▼ Baja</button>
-      <button class="fbtn" onclick="setFilter('high',this)">±&gt;20%</button>
-    </div>
-  </div>
-  <div class="ctrl-group">
-    <div class="ctrl-label">Ordenar</div>
-    <select class="sort-sel" id="sortby" onchange="render()">
-      <option value="nombre">Nombre A→Z</option>
-      <option value="var-desc">Variación ▼</option>
-      <option value="var-asc">Variación ▲</option>
-      <option value="ing-desc">Ingresos totales ▼</option>
-      <option value="htt-desc">Horas totales ▼</option>
-    </select>
-  </div>
+  <input class="search-box" type="text" id="searchInput" placeholder="🔍  Buscar guardia...">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="up">▲ Subió</button>
+  <button class="filter-btn" data-filter="down">▼ Bajó</button>
+  <button class="filter-btn" data-filter="stable">— Estable (±5%)</button>
+  <span class="sort-label">Ordenar por:</span>
+  <select class="sort-select" id="sortSelect">
+    <option value="nombre">Nombre A-Z</option>
+    <option value="var_desc">Mayor variación ↑</option>
+    <option value="var_asc">Menor variación ↓</option>
+    <option value="avg_desc">Ingreso promedio ↑</option>
+  </select>
 </div>
 
-<div class="content">
-  <div class="rcount" id="rcount"></div>
-  <!-- CARDS -->
-  <div id="cards-view">
-    <div class="cards-grid" id="grid"></div>
-    <div class="empty-msg" id="empty" style="display:none">Sin resultados.</div>
-  </div>
-  <!-- TABLE -->
-  <div id="table-view">
-    <div class="tbl-wrap"><table id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
-    <div class="empty-msg" id="empty-tbl" style="display:none">Sin resultados.</div>
+<div class="grid" id="grid"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2 id="modalName"></h2>
+    <p id="modalSub" style="color:var(--muted);font-size:.8rem;margin-bottom:4px;"></p>
+    <div class="modal-chart-wrap"><canvas id="modalChart"></canvas></div>
+    <table class="detail-table" id="detailTable"></table>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════ DATA ═══════════════════════════════ */
-const ALL_PERIODOS = ["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02"];
-const ALL_LABELS   = ["ENE 25","FEB 25","MAR 25","ABR 25","MAY 25","JUN 25","JUL 25","AGO 25","SEP 25","OCT 25","NOV 25","DIC 25","ENE 26","FEB 26"];
-const ALL_LABELS_FULL = ["ENERO 2025","FEBRERO 2025","MARZO 2025","ABRIL 2025","MAYO 2025","JUNIO 2025","JULIO 2025","AGOSTO 2025","SEPTIEMBRE 2025","OCTUBRE 2025","NOVIEMBRE 2025","DICIEMBRE 2025","ENERO 2026","FEBRERO 2026"];
+const DATA = {"periodos":["SEP 2025","OCT 2025","NOV 2025","DIC 2025","ENE 2026","FEB 2026"],"personas":{"AVILIO ANDRES AVEIRO SOLIS":{"horas":[249.5,301.0,301.0,272.0,242.9,225.0],"ingresos":[4340172.0,5190547.0,5148647.0,4667517.0,4172418.0,3800487.0],"var_pct":-12.4,"avg_ing":4553298.0},"BLAS ANTONIO NUÑEZ OCAMPOS":{"horas":[146.0,215.5,132.0,166.0,192.0,232.0],"ingresos":[2210140.0,3331190.0,2014280.0,2527650.0,2979380.0,3501270.0],"var_pct":58.4,"avg_ing":2760652.0},"CHAVEZ MARTINEZ GUIDO JOEL":{"horas":[240.0,252.0,276.0,276.0,96.0,264.0],"ingresos":[3647505.0,3815385.0,4006192.0,4006192.0,1487992.0,3838312.0],"var_pct":5.2,"avg_ing":3466930.0},"CHIARA SALZA":{"horas":[null,null,null,84.0,96.0,72.0],"ingresos":[null,null,null,1175160.0,1343040.0,1007280.0],"var_pct":-14.3,"avg_ing":1175160.0},"DAISY EUGENIA GOMEZ COLMAN":{"horas":[240.0,240.0,264.0,null,null,null],"ingresos":[3357600.0,3357600.0,3693360.0,null,null,null],"var_pct":10.0,"avg_ing":3469520.0},"DENY GOMEZ":{"horas":[302.0,276.0,289.0,255.0,249.5,275.5],"ingresos":[5026065.0,4574335.0,4760395.0,4322445.0,4199410.0,4575720.0],"var_pct":-9.0,"avg_ing":4576395.0},"DIGNA CONCEPCION RUIZ":{"horas":[216.0,216.0,168.0,194.0,168.0,168.0],"ingresos":[3398940.0,3398940.0,2643620.0,3053450.0,2643620.0,2643620.0],"var_pct":-22.2,"avg_ing":2963698.0},"DUARTE SALDIVAR NELSON SILVESTRE":{"horas":[312.0,288.0,288.0,312.0,312.0,276.0],"ingresos":[5199485.0,4821825.0,4821825.0,5241385.0,5199485.0,4612045.0],"var_pct":-11.3,"avg_ing":4982675.0},"ELVIS FABIAN SALINAS ESPINOZA":{"horas":[null,13.0,12.0,34.0,null,null],"ingresos":[null,186060.0,167880.0,484040.0,null,null],"var_pct":160.2,"avg_ing":279327.0},"ELVIS SALINAS":{"horas":[null,null,null,null,null,9.5],"ingresos":[null,null,null,null,null,132905.0],"var_pct":null,"avg_ing":132905.0},"FERNANDEZ JARA JOSE MIGUEL":{"horas":[312.0,368.0,380.5,355.5,375.0,141.0],"ingresos":[4549240.0,5357820.0,5578785.0,5201800.0,5459940.0,2068960.0],"var_pct":-54.5,"avg_ing":4702758.0},"FRANCISCO MIGUEL PLATON":{"horas":[220.0,156.5,315.0,310.0,300.0,212.0],"ingresos":[3421380.0,2417790.0,4788140.0,4709810.0,4532200.0,3338790.0],"var_pct":-2.4,"avg_ing":3868018.0},"GERMAN OLMEDO AYALA":{"horas":[276.0,164.0,252.0,264.0,204.0,180.0],"ingresos":[3861240.0,2294360.0,3525480.0,3693360.0,2853960.0,2518200.0],"var_pct":-34.8,"avg_ing":3124433.0},"GONZALO GIMENEZ":{"horas":[3.5,null,null,null,null,null],"ingresos":[48965.0,null,null,null,null,null],"var_pct":null,"avg_ing":48965.0},"JULIO CESAR FERNANDEZ RODAS":{"horas":[267.5,390.0,351.5,288.0,360.0,288.0],"ingresos":[3972775.0,5833200.0,5294585.0,4280520.0,5413500.0,4364320.0],"var_pct":9.9,"avg_ing":4859817.0},"KAREN BURGOS":{"horas":[null,null,null,276.0,276.0,228.0],"ingresos":[null,null,null,3861240.0,3861240.0,3189720.0],"var_pct":-17.4,"avg_ing":3637400.0},"KAREN PEREIRA":{"horas":[null,null,null,null,132.0,null],"ingresos":[null,null,null,null,1846680.0,null],"var_pct":null,"avg_ing":1846680.0},"KARLOS PAREDES":{"horas":[null,null,null,156.0,220.0,176.0],"ingresos":[null,null,null,2308140.0,3287300.0,2634030.0],"var_pct":14.1,"avg_ing":2743157.0},"KEVIN GONZALEZ":{"horas":[null,null,168.5,168.0,204.0,240.0],"ingresos":[null,null,2357315.0,2350320.0,2853960.0,3357600.0],"var_pct":42.4,"avg_ing":2729799.0},"LOPEZ GUANES TALIA JAZMIN":{"horas":[217.5,240.0,205.0,216.0,204.0,240.0],"ingresos":[3187777.0,3502552.0,3012902.0,3166792.0,2998912.0,3544452.0],"var_pct":11.2,"avg_ing":3235564.0},"MARIO JOAQUIN ECHAGUE OJEDA":{"horas":[288.0,288.0,300.0,264.0,261.0,233.0],"ingresos":[4490020.0,4490020.0,4699800.0,4112360.0,4028490.0,3594870.0],"var_pct":-19.9,"avg_ing":4235927.0},"MARTINEZ CARBALLO DIEGO ANTONIO":{"horas":[300.0,324.0,285.5,300.0,172.0,276.0],"ingresos":[4811232.0,5138612.0,4558097.0,4802852.0,2802632.0,4425192.0],"var_pct":-8.0,"avg_ing":4423103.0},"MENDOZA BAEZ, MARIO ROBERTO":{"horas":[180.0,192.0,180.0,180.0,192.0,156.0],"ingresos":[2663152.0,2831032.0,2663152.0,2663152.0,2831032.0,2327392.0],"var_pct":-12.6,"avg_ing":2663152.0},"MIGUEL CARBALLO":{"horas":[126.0,138.0,109.0,66.0,null,null],"ingresos":[1905200.0,2110790.0,1696700.0,977810.0,null,null],"var_pct":-48.7,"avg_ing":1672625.0},"NATALIA VIVIANA TORRES BRITEZ":{"horas":[240.0,234.5,144.0,null,null,null],"ingresos":[3357600.0,3280655.0,2014560.0,null,null,null],"var_pct":-40.0,"avg_ing":2884272.0},"NELSON BAREIRO":{"horas":[235.5,361.5,254.0,166.5,219.5,272.0],"ingresos":[3319785.0,5155850.0,3607930.0,2373330.0,3070805.0,3838800.0],"var_pct":15.6,"avg_ing":3561083.0},"OCAMPO BRITEZ JOSE DAVID":{"horas":[216.5,252.5,180.5,206.0,203.0,216.0],"ingresos":[3368225.0,3955665.0,2814305.0,3221330.0,3175170.0,3398940.0],"var_pct":0.9,"avg_ing":3322272.0},"OSVALDO AGUILAR":{"horas":[null,null,null,24.0,12.0,31.0],"ingresos":[null,null,null,335760.0,167880.0,446260.0],"var_pct":32.9,"avg_ing":316633.0},"PAOLA ELIZABETH GAYOSO CABRERA":{"horas":[255.5,216.0,252.0,298.0,217.0,201.0],"ingresos":[4077245.0,3398940.0,3902580.0,4625730.0,3454830.0,3184900.0],"var_pct":-21.9,"avg_ing":3774038.0},"PAVON MENDEZ ROCIO ELIZABETH":{"horas":[214.5,240.0,204.0,192.0,240.0,192.0],"ingresos":[3481007.0,3879652.0,3334112.0,3124332.0,3879652.0,3166232.0],"var_pct":-9.0,"avg_ing":3477498.0},"PEDRO ARGUELLO":{"horas":[null,null,193.0,204.0,252.0,216.0],"ingresos":[null,null,2700070.0,2853960.0,3525480.0,3021840.0],"var_pct":11.9,"avg_ing":3025338.0},"PEDRO PEREZ":{"horas":[null,null,null,214.0,307.0,239.0],"ingresos":[null,null,null,3215930.0,4336830.0,3435790.0],"var_pct":6.8,"avg_ing":3662850.0},"PEÑA VERA JULIO CESAR":{"horas":[312.0,311.0,312.0,305.0,303.0,288.0],"ingresos":[4909580.0,4895590.0,4909580.0,4993520.0,4741770.0,4531920.0],"var_pct":-7.7,"avg_ing":4830327.0},"RICARDO GOMEZ":{"horas":[180.0,180.0,180.0,204.0,180.0,180.0],"ingresos":[2518200.0,2518200.0,2518200.0,2853960.0,2518200.0,2518200.0],"var_pct":0.0,"avg_ing":2574160.0},"RICHARD RAFAEL GUERRERO FERNANDEZ":{"horas":[322.5,246.0,264.0,84.0,300.0,288.0],"ingresos":[5113437.0,3963592.0,4215412.0,1445812.0,4760952.0,4593072.0],"var_pct":-10.2,"avg_ing":4015380.0},"RODRIGO AGÜERO":{"horas":[232.0,280.0,228.0,161.0,224.0,259.8],"ingresos":[3262440.0,3929770.0,3384952.0,2451812.0,3339467.0,3984864.0],"var_pct":22.1,"avg_ing":3392218.0},"ROISA JARA":{"horas":[null,null,null,null,null,12.0],"ingresos":[null,null,null,null,null,167880.0],"var_pct":null,"avg_ing":167880.0},"SAMUEL RAMON MONTIEL VERON":{"horas":[240.0,312.0,240.0,204.0,228.0,204.0],"ingresos":[3734700.0,4867680.0,3692800.0,3189160.0,3524920.0,3189160.0],"var_pct":-14.6,"avg_ing":3699737.0},"SANDOVAL CHAPARRO GUSTAVO RAUL":{"horas":[120.0,96.0,96.0,120.0,96.0,96.0],"ingresos":[2077130.0,1661704.0,1661704.0,2077130.0,1661704.0,1661704.0],"var_pct":-20.0,"avg_ing":1800179.0},"SANTOS BENITEZ EDGAR BIENVENIDO":{"horas":[309.0,371.0,400.0,334.0,369.0,323.0],"ingresos":[4507270.0,5403980.0,5872540.0,4852830.0,5430470.0,4707320.0],"var_pct":4.4,"avg_ing":5129068.0},"VALDEZ LARROSA BLAS ANTONIO":{"horas":[328.0,380.0,362.0,380.0,364.0,287.0],"ingresos":[4928110.0,5714250.0,5412150.0,5714250.0,5821420.0,4291670.0],"var_pct":-12.9,"avg_ing":5313642.0}}};
 
-const RAW = {"periodos":["2025-01","2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02"],"labels":["ENERO 2025","FEBRERO 2025","MARZO 2025","ABRIL 2025","MAYO 2025","JUNIO 2025","JULIO 2025","AGOSTO 2025","SEPTIEMBRE 2025","OCTUBRE 2025","NOVIEMBRE 2025","DICIEMBRE 2025","ENERO 2026","FEBRERO 2026"],"personas":[{"nombre":"ARAUJO ARRUA ADA ELIZABETH","meses":{"2025-01":{"label":"ENERO 2025","htt":216.0,"hd":146.0,"hn":70.0,"ingresos":3199500,"neto":2911545},"2025-02":{"label":"FEBRERO 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3280500,"neto":2985255},"2025-03":{"label":"MARZO 2025","htt":192.0,"hd":112.0,"hn":80.0,"ingresos":2916000,"neto":2653560},"2025-04":{"label":"ABRIL 2025","htt":201.0,"hd":121.0,"hn":80.0,"ingresos":3037500,"neto":2761987},"2025-05":{"label":"MAYO 2025","htt":180.0,"hd":120.0,"hn":60.0,"ingresos":2673000,"neto":2498643},"2025-06":{"label":"JUNIO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1510640,"neto":1300364},"2025-07":{"label":"JULIO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1510640,"neto":1300364},"2025-08":{"label":"AGOSTO 2025","htt":51.0,"hd":31.0,"hn":20.0,"ingresos":0,"neto":0}}},{"nombre":"AVILIO ANDRES AVEIRO SOLIS","meses":{"2025-01":{"label":"ENERO 2025","htt":216.0,"hd":146.0,"hn":70.0,"ingresos":3199500,"neto":2729265},"2025-02":{"label":"FEBRERO 2025","htt":228.0,"hd":138.0,"hn":90.0,"ingresos":3442500,"neto":3045920},"2025-03":{"label":"MARZO 2025","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4374000,"neto":3980601},"2025-04":{"label":"ABRIL 2025","htt":236.0,"hd":146.0,"hn":90.0,"ingresos":3970245,"neto":3655245},"2025-05":{"label":"MAYO 2025","htt":211.5,"hd":131.5,"hn":80.0,"ingresos":3598995,"neto":3283995},"2025-06":{"label":"JUNIO 2025","htt":228.5,"hd":148.5,"hn":80.0,"ingresos":3966772,"neto":3510788},"2025-07":{"label":"JULIO 2025","htt":228.5,"hd":148.5,"hn":80.0,"ingresos":3966772,"neto":3510788},"2025-08":{"label":"AGOSTO 2025","htt":262.0,"hd":172.0,"hn":90.0,"ingresos":4477337,"neto":4095671},"2025-09":{"label":"SEPTIEMBRE 2025","htt":249.5,"hd":150.5,"hn":99.0,"ingresos":4340172,"neto":4025172},"2025-10":{"label":"OCTUBRE 2025","htt":301.0,"hd":171.0,"hn":130.0,"ingresos":5190547,"neto":4875547},"2025-11":{"label":"NOVIEMBRE 2025","htt":301.0,"hd":181.0,"hn":120.0,"ingresos":5148647,"neto":4833647},"2025-12":{"label":"DICIEMBRE 2025","htt":272.0,"hd":170.0,"hn":102.0,"ingresos":4667517,"neto":4351118},"2026-01":{"label":"ENERO 2026","htt":242.9,"hd":161.9,"hn":81.0,"ingresos":4172418,"neto":3845992},"2026-02":{"label":"FEBRERO 2026","htt":225.0,"hd":173.0,"hn":52.0,"ingresos":3800487,"neto":3497580}}},{"nombre":"BLAS ANTONIO NUÑEZ OCAMPOS","meses":{"2025-02":{"label":"FEBRERO 2025","htt":60.0,"hd":60.0,"hn":0.0,"ingresos":810000,"neto":810000},"2025-03":{"label":"MARZO 2025","htt":48.0,"hd":48.0,"hn":0.0,"ingresos":648000,"neto":648000},"2025-04":{"label":"ABRIL 2025","htt":60.0,"hd":60.0,"hn":0.0,"ingresos":810000,"neto":810000},"2025-05":{"label":"MAYO 2025","htt":60.0,"hd":50.0,"hn":10.0,"ingresos":850500,"neto":850500},"2025-06":{"label":"JUNIO 2025","htt":72.0,"hd":72.0,"hn":0.0,"ingresos":1007280,"neto":932962},"2025-07":{"label":"JULIO 2025","htt":72.0,"hd":72.0,"hn":0.0,"ingresos":1007280,"neto":932962},"2025-08":{"label":"AGOSTO 2025","htt":84.0,"hd":64.0,"hn":20.0,"ingresos":1258960,"neto":1258960},"2025-09":{"label":"SEPTIEMBRE 2025","htt":146.0,"hd":106.0,"hn":40.0,"ingresos":2210140,"neto":2011227},"2025-10":{"label":"OCTUBRE 2025","htt":215.5,"hd":140.0,"hn":75.5,"ingresos":3331190,"neto":3031382},"2025-11":{"label":"NOVIEMBRE 2025","htt":132.0,"hd":92.0,"hn":40.0,"ingresos":2014280,"neto":1795835},"2025-12":{"label":"DICIEMBRE 2025","htt":166.0,"hd":117.0,"hn":49.0,"ingresos":2527650,"neto":2294096},"2026-01":{"label":"ENERO 2026","htt":192.0,"hd":122.0,"hn":70.0,"ingresos":2979380,"neto":2782985},"2026-02":{"label":"FEBRERO 2026","htt":232.0,"hd":171.0,"hn":61.0,"ingresos":3501270,"neto":3186270}}},{"nombre":"CARLOS DANIEL CORVALAN ESPINOLA","meses":{"2025-01":{"label":"ENERO 2025","htt":216.0,"hd":216.0,"hn":0.0,"ingresos":3615575,"neto":3350025},"2025-02":{"label":"FEBRERO 2025","htt":212.5,"hd":212.5,"hn":0.0,"ingresos":3568325,"neto":3292648},"2025-03":{"label":"MARZO 2025","htt":248.0,"hd":238.0,"hn":10.0,"ingresos":3388500,"neto":3388500}}},{"nombre":"CESAR SANABRIA","meses":{"2025-01":{"label":"ENERO 2025","htt":84.0,"hd":84.0,"hn":0.0,"ingresos":1134000,"neto":1134000},"2025-02":{"label":"FEBRERO 2025","htt":60.0,"hd":60.0,"hn":0.0,"ingresos":810000,"neto":810000}}},{"nombre":"CHAVEZ MARTINEZ GUIDO JOEL","meses":{"2025-01":{"label":"ENERO 2025","htt":144.0,"hd":144.0,"hn":0.0,"ingresos":2223830,"neto":2048870},"2025-02":{"label":"FEBRERO 2025","htt":156.0,"hd":156.0,"hn":0.0,"ingresos":2385830,"neto":2196290},"2025-03":{"label":"MARZO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3681830,"neto":3375650},"2025-04":{"label":"ABRIL 2025","htt":242.0,"hd":241.0,"hn":1.0,"ingresos":3550880,"neto":3256486},"2025-05":{"label":"MAYO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3681830,"neto":3375650},"2025-06":{"label":"JUNIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3815384,"neto":3433718},"2025-07":{"label":"JULIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3815384,"neto":3433718},"2025-08":{"label":"AGOSTO 2025","htt":262.5,"hd":254.0,"hn":8.5,"ingresos":3997894,"neto":3616228},"2025-09":{"label":"SEPTIEMBRE 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3647504,"neto":3332504},"2025-10":{"label":"OCTUBRE 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3815384,"neto":3496886},"2025-11":{"label":"NOVIEMBRE 2025","htt":276.0,"hd":276.0,"hn":0.0,"ingresos":4006192,"neto":3691192},"2025-12":{"label":"DICIEMBRE 2025","htt":276.0,"hd":276.0,"hn":0.0,"ingresos":4006192,"neto":3686995},"2026-01":{"label":"ENERO 2026","htt":96.0,"hd":96.0,"hn":0.0,"ingresos":1487992,"neto":1367118},"2026-02":{"label":"FEBRERO 2026","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3838312,"neto":3523312}}},{"nombre":"CHIARA SALZA","meses":{"2025-12":{"label":"DICIEMBRE 2025","htt":84.0,"hd":84.0,"hn":0.0,"ingresos":1175160,"neto":1069395},"2026-01":{"label":"ENERO 2026","htt":96.0,"hd":96.0,"hn":0.0,"ingresos":1343040,"neto":1241824},"2026-02":{"label":"FEBRERO 2026","htt":72.0,"hd":72.0,"hn":0.0,"ingresos":1007280,"neto":916624}}},{"nombre":"CORNET CRISTALDO NERY RODRIGO","meses":{"2025-05":{"label":"MAYO 2025","htt":24.0,"hd":14.0,"hn":10.0,"ingresos":364500,"neto":364500},"2025-06":{"label":"JUNIO 2025","htt":57.5,"hd":57.5,"hn":0.0,"ingresos":804425,"neto":0},"2025-07":{"label":"JULIO 2025","htt":57.5,"hd":57.5,"hn":0.0,"ingresos":0,"neto":0}}},{"nombre":"DAISY EUGENIA GOMEZ COLMAN","meses":{"2025-01":{"label":"ENERO 2025","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2754000,"neto":2506140},"2025-02":{"label":"FEBRERO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2430000,"neto":2209551},"2025-03":{"label":"MARZO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2430000,"neto":2211300},"2025-04":{"label":"ABRIL 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2430000,"neto":2211300},"2025-05":{"label":"MAYO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2592000,"neto":2358720},"2025-06":{"label":"JUNIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-07":{"label":"JULIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-08":{"label":"AGOSTO 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3693360,"neto":3378360},"2025-09":{"label":"SEPTIEMBRE 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3357600,"neto":3055416},"2025-10":{"label":"OCTUBRE 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3357600,"neto":3053551},"2025-11":{"label":"NOVIEMBRE 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3693360,"neto":3378360}}},{"nombre":"DENY GOMEZ","meses":{"2025-01":{"label":"ENERO 2025","htt":288.0,"hd":208.0,"hn":80.0,"ingresos":4212000,"neto":3894675},"2025-02":{"label":"FEBRERO 2025","htt":255.5,"hd":195.5,"hn":60.0,"ingresos":3692250,"neto":3373363},"2025-03":{"label":"MARZO 2025","htt":362.0,"hd":232.0,"hn":130.0,"ingresos":5413500,"neto":5017964},"2025-04":{"label":"ABRIL 2025","htt":300.0,"hd":200.0,"hn":100.0,"ingresos":4455000,"neto":4065682},"2025-05":{"label":"MAYO 2025","htt":287.5,"hd":197.5,"hn":90.0,"ingresos":4245750,"neto":3930750},"2025-06":{"label":"JUNIO 2025","htt":265.0,"hd":155.0,"hn":110.0,"ingresos":4168250,"neto":3778932},"2025-07":{"label":"JULIO 2025","htt":265.0,"hd":155.0,"hn":110.0,"ingresos":4168250,"neto":3778932},"2025-08":{"label":"AGOSTO 2025","htt":311.0,"hd":201.5,"hn":109.5,"ingresos":4809695,"neto":4494695},"2025-09":{"label":"SEPTIEMBRE 2025","htt":302.0,"hd":180.0,"hn":122.0,"ingresos":5026064,"neto":4377731},"2025-10":{"label":"OCTUBRE 2025","htt":276.0,"hd":175.0,"hn":101.0,"ingresos":4574334,"neto":3926001},"2025-11":{"label":"NOVIEMBRE 2025","htt":289.0,"hd":187.0,"hn":102.0,"ingresos":4760394,"neto":4112061},"2025-12":{"label":"DICIEMBRE 2025","htt":255.0,"hd":144.0,"hn":111.0,"ingresos":4322444,"neto":3673411},"2026-01":{"label":"ENERO 2026","htt":249.5,"hd":149.5,"hn":100.0,"ingresos":4199409,"neto":3490575},"2026-02":{"label":"FEBRERO 2026","htt":275.5,"hd":172.5,"hn":103.0,"ingresos":4575719,"neto":3927386}}},{"nombre":"DIGNA CONCEPCION RUIZ","meses":{"2025-01":{"label":"ENERO 2025","htt":204.0,"hd":114.0,"hn":90.0,"ingresos":3118500,"neto":2836086},"2025-02":{"label":"FEBRERO 2025","htt":192.0,"hd":122.0,"hn":70.0,"ingresos":2875500,"neto":2612235},"2025-03":{"label":"MARZO 2025","htt":197.5,"hd":117.5,"hn":80.0,"ingresos":2990250,"neto":2718989},"2025-04":{"label":"ABRIL 2025","htt":132.0,"hd":82.0,"hn":50.0,"ingresos":1984500,"neto":1805895},"2025-05":{"label":"MAYO 2025","htt":240.0,"hd":140.0,"hn":100.0,"ingresos":3645000,"neto":3212045},"2025-06":{"label":"JUNIO 2025","htt":248.5,"hd":140.0,"hn":108.5,"ingresos":3931130,"neto":3615005},"2025-07":{"label":"JULIO 2025","htt":248.5,"hd":140.0,"hn":108.5,"ingresos":3931130,"neto":3615005},"2025-08":{"label":"AGOSTO 2025","htt":191.0,"hd":121.0,"hn":70.0,"ingresos":2965390,"neto":2698504},"2025-09":{"label":"SEPTIEMBRE 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3398940,"neto":3093035},"2025-10":{"label":"OCTUBRE 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3398940,"neto":3081124},"2025-11":{"label":"NOVIEMBRE 2025","htt":168.0,"hd":98.0,"hn":70.0,"ingresos":2643620,"neto":2405228},"2025-12":{"label":"DICIEMBRE 2025","htt":194.0,"hd":113.0,"hn":81.0,"ingresos":3053450,"neto":2778129},"2026-01":{"label":"ENERO 2026","htt":168.0,"hd":98.0,"hn":70.0,"ingresos":2643620,"neto":2376903},"2026-02":{"label":"FEBRERO 2026","htt":168.0,"hd":98.0,"hn":70.0,"ingresos":2643620,"neto":2405694}}},{"nombre":"DUARTE SALDIVAR NELSON SILVESTRE","meses":{"2025-01":{"label":"ENERO 2025","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4513915,"neto":4196194},"2025-02":{"label":"FEBRERO 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4878415,"neto":4558945},"2025-03":{"label":"MARZO 2025","htt":307.0,"hd":177.0,"hn":130.0,"ingresos":4810915,"neto":4495915},"2025-04":{"label":"ABRIL 2025","htt":144.0,"hd":84.0,"hn":60.0,"ingresos":2326915,"neto":2130085},"2025-05":{"label":"MAYO 2025","htt":300.0,"hd":170.0,"hn":130.0,"ingresos":4716415,"neto":4327097},"2025-06":{"label":"JUNIO 2025","htt":264.0,"hd":154.0,"hn":110.0,"ingresos":4299212,"neto":3911246},"2025-07":{"label":"JULIO 2025","htt":264.0,"hd":154.0,"hn":110.0,"ingresos":4299212,"neto":3911246},"2025-08":{"label":"AGOSTO 2025","htt":169.5,"hd":98.0,"hn":71.5,"ingresos":4313683,"neto":3858786},"2025-09":{"label":"SEPTIEMBRE 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":5199484,"neto":4884484},"2025-10":{"label":"OCTUBRE 2025","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4821824,"neto":4506824},"2025-11":{"label":"NOVIEMBRE 2025","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4821824,"neto":4506824},"2025-12":{"label":"DICIEMBRE 2025","htt":312.0,"hd":172.0,"hn":140.0,"ingresos":5241384,"neto":4926384},"2026-01":{"label":"ENERO 2026","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":5199484,"neto":4856504},"2026-02":{"label":"FEBRERO 2026","htt":276.0,"hd":166.0,"hn":110.0,"ingresos":4612044,"neto":4297044}}},{"nombre":"ELVIS FABIAN SALINAS ESPINOZA","meses":{"2025-01":{"label":"ENERO 2025","htt":169.0,"hd":169.0,"hn":0.0,"ingresos":2281500,"neto":2281500},"2025-02":{"label":"FEBRERO 2025","htt":136.0,"hd":136.0,"hn":0.0,"ingresos":1836000,"neto":1836000},"2025-03":{"label":"MARZO 2025","htt":13.0,"hd":13.0,"hn":0.0,"ingresos":175500,"neto":175500},"2025-04":{"label":"ABRIL 2025","htt":142.0,"hd":142.0,"hn":0.0,"ingresos":1917000,"neto":1917000},"2025-05":{"label":"MAYO 2025","htt":154.0,"hd":154.0,"hn":0.0,"ingresos":2079000,"neto":2035364},"2025-06":{"label":"JUNIO 2025","htt":168.0,"hd":167.0,"hn":1.0,"ingresos":2354510,"neto":2287844},"2025-07":{"label":"JULIO 2025","htt":168.0,"hd":167.0,"hn":1.0,"ingresos":2354510,"neto":2287844},"2025-08":{"label":"AGOSTO 2025","htt":44.5,"hd":36.0,"hn":8.5,"ingresos":658170,"neto":591504},"2025-10":{"label":"OCTUBRE 2025","htt":13.0,"hd":12.0,"hn":1.0,"ingresos":186060,"neto":186060},"2025-11":{"label":"NOVIEMBRE 2025","htt":12.0,"hd":12.0,"hn":0.0,"ingresos":167880,"neto":152770},"2025-12":{"label":"DICIEMBRE 2025","htt":34.0,"hd":32.0,"hn":2.0,"ingresos":484040,"neto":440476}}},{"nombre":"ELVIS SALINAS","meses":{"2026-02":{"label":"FEBRERO 2026","htt":9.5,"hd":9.5,"hn":0.0,"ingresos":132905,"neto":120943}}},{"nombre":"FERNANDEZ JARA JOSE MIGUEL","meses":{"2025-01":{"label":"ENERO 2025","htt":218.0,"hd":165.0,"hn":53.0,"ingresos":3157650,"neto":2873461},"2025-02":{"label":"FEBRERO 2025","htt":328.0,"hd":258.0,"hn":70.0,"ingresos":4711500,"neto":4395200},"2025-03":{"label":"MARZO 2025","htt":346.0,"hd":262.0,"hn":84.0,"ingresos":5011200,"neto":4696200},"2025-04":{"label":"ABRIL 2025","htt":320.0,"hd":231.0,"hn":89.0,"ingresos":4680450,"neto":4365450},"2025-05":{"label":"MAYO 2025","htt":357.0,"hd":294.0,"hn":63.0,"ingresos":5074650,"neto":4759650},"2025-06":{"label":"JUNIO 2025","htt":354.0,"hd":296.0,"hn":58.0,"ingresos":5195480,"neto":4739496},"2025-07":{"label":"JULIO 2025","htt":354.0,"hd":296.0,"hn":58.0,"ingresos":5195480,"neto":4739496},"2025-08":{"label":"AGOSTO 2025","htt":364.0,"hd":297.5,"hn":66.5,"ingresos":5370995,"neto":4989329},"2025-09":{"label":"SEPTIEMBRE 2025","htt":312.0,"hd":268.0,"hn":44.0,"ingresos":4549240,"neto":4234240},"2025-10":{"label":"OCTUBRE 2025","htt":368.0,"hd":318.0,"hn":50.0,"ingresos":5357820,"neto":5042820},"2025-11":{"label":"NOVIEMBRE 2025","htt":380.5,"hd":319.5,"hn":61.0,"ingresos":5578785,"neto":5263785},"2025-12":{"label":"DICIEMBRE 2025","htt":355.5,"hd":301.0,"hn":54.5,"ingresos":5201800,"neto":4886800},"2026-01":{"label":"ENERO 2026","htt":375.0,"hd":324.0,"hn":51.0,"ingresos":5459940,"neto":5115735},"2026-02":{"label":"FEBRERO 2026","htt":141.0,"hd":118.0,"hn":23.0,"ingresos":2068960,"neto":1878806}}},{"nombre":"FRANCISCO MIGUEL PLATON","meses":{"2025-01":{"label":"ENERO 2025","htt":265.5,"hd":175.5,"hn":90.0,"ingresos":3948750,"neto":3633750},"2025-02":{"label":"FEBRERO 2025","htt":187.0,"hd":117.0,"hn":70.0,"ingresos":2808000,"neto":2555280},"2025-03":{"label":"MARZO 2025","htt":174.5,"hd":114.5,"hn":60.0,"ingresos":2598750,"neto":2364862},"2025-04":{"label":"ABRIL 2025","htt":205.0,"hd":125.0,"hn":80.0,"ingresos":3091500,"neto":2813265},"2025-05":{"label":"MAYO 2025","htt":180.0,"hd":110.0,"hn":70.0,"ingresos":2713500,"neto":2469285},"2025-06":{"label":"JUNIO 2025","htt":239.5,"hd":149.5,"hn":90.0,"ingresos":3727705,"neto":3330062},"2025-07":{"label":"JULIO 2025","htt":239.5,"hd":149.5,"hn":90.0,"ingresos":3727705,"neto":3330062},"2025-08":{"label":"AGOSTO 2025","htt":260.5,"hd":160.5,"hn":100.0,"ingresos":4063395,"neto":3748395},"2025-09":{"label":"SEPTIEMBRE 2025","htt":220.0,"hd":138.0,"hn":82.0,"ingresos":3421380,"neto":3113455},"2025-10":{"label":"OCTUBRE 2025","htt":156.5,"hd":102.0,"hn":54.5,"ingresos":2417790,"neto":2200188},"2025-11":{"label":"NOVIEMBRE 2025","htt":315.0,"hd":224.0,"hn":91.0,"ingresos":4788140,"neto":4473140},"2025-12":{"label":"DICIEMBRE 2025","htt":310.0,"hd":221.0,"hn":89.0,"ingresos":4709810,"neto":4390846},"2026-01":{"label":"ENERO 2026","htt":300.0,"hd":220.0,"hn":80.0,"ingresos":4532200,"neto":4217200},"2026-02":{"label":"FEBRERO 2026","htt":212.0,"hd":123.0,"hn":89.0,"ingresos":3338790,"neto":3038298}}},{"nombre":"GERMAN OLMEDO AYALA","meses":{"2025-01":{"label":"ENERO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2592000,"neto":2358720},"2025-02":{"label":"FEBRERO 2025","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2754000,"neto":2506140},"2025-03":{"label":"MARZO 2025","htt":264.0,"hd":254.0,"hn":10.0,"ingresos":3604500,"neto":3289500},"2025-04":{"label":"ABRIL 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3564000,"neto":3249000},"2025-05":{"label":"MAYO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3402000,"neto":3095820},"2025-06":{"label":"JUNIO 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3693360,"neto":3311694},"2025-07":{"label":"JULIO 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3693360,"neto":3311694},"2025-08":{"label":"AGOSTO 2025","htt":346.5,"hd":346.5,"hn":0.0,"ingresos":4847535,"neto":4465869},"2025-09":{"label":"SEPTIEMBRE 2025","htt":276.0,"hd":276.0,"hn":0.0,"ingresos":3861240,"neto":3546240},"2025-10":{"label":"OCTUBRE 2025","htt":164.0,"hd":164.0,"hn":0.0,"ingresos":2294360,"neto":2083670},"2025-11":{"label":"NOVIEMBRE 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-12":{"label":"DICIEMBRE 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3693360,"neto":3378360},"2026-01":{"label":"ENERO 2026","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2853960,"neto":2597103},"2026-02":{"label":"FEBRERO 2026","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562}}},{"nombre":"GONZALO GIMENEZ","meses":{"2025-05":{"label":"MAYO 2025","htt":8.0,"hd":8.0,"hn":0.0,"ingresos":108000,"neto":108000},"2025-08":{"label":"AGOSTO 2025","htt":6.0,"hd":4.0,"hn":2.0,"ingresos":92320,"neto":92320},"2025-09":{"label":"SEPTIEMBRE 2025","htt":3.5,"hd":3.5,"hn":0.0,"ingresos":48965,"neto":48965}}},{"nombre":"JULIO CESAR FERNANDEZ RODAS","meses":{"2025-01":{"label":"ENERO 2025","htt":264.0,"hd":164.0,"hn":100.0,"ingresos":3969000,"neto":3654000},"2025-02":{"label":"FEBRERO 2025","htt":163.0,"hd":103.0,"hn":60.0,"ingresos":2443500,"neto":2223585},"2025-03":{"label":"MARZO 2025","htt":301.0,"hd":191.0,"hn":110.0,"ingresos":4509000,"neto":4194000},"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":172.0,"hn":80.0,"ingresos":3726000,"neto":3411000},"2025-05":{"label":"MAYO 2025","htt":288.0,"hd":198.0,"hn":90.0,"ingresos":4252500,"neto":3863182},"2025-06":{"label":"JUNIO 2025","htt":300.0,"hd":230.0,"hn":70.0,"ingresos":4490300,"neto":4108634},"2025-07":{"label":"JULIO 2025","htt":300.0,"hd":230.0,"hn":70.0,"ingresos":4490300,"neto":4108634},"2025-08":{"label":"AGOSTO 2025","htt":34.0,"hd":24.0,"hn":10.0,"ingresos":517560,"neto":404313},"2025-09":{"label":"SEPTIEMBRE 2025","htt":267.5,"hd":212.5,"hn":55.0,"ingresos":3972775,"neto":3657773},"2025-10":{"label":"OCTUBRE 2025","htt":390.0,"hd":300.0,"hn":90.0,"ingresos":5833200,"neto":5518200},"2025-11":{"label":"NOVIEMBRE 2025","htt":351.5,"hd":261.5,"hn":90.0,"ingresos":5294585,"neto":4979585},"2025-12":{"label":"DICIEMBRE 2025","htt":288.0,"hd":228.0,"hn":60.0,"ingresos":4280520,"neto":3965520},"2026-01":{"label":"ENERO 2026","htt":360.0,"hd":270.0,"hn":90.0,"ingresos":5413500,"neto":5007577},"2026-02":{"label":"FEBRERO 2026","htt":288.0,"hd":208.0,"hn":80.0,"ingresos":4364320,"neto":4049320}}},{"nombre":"KAREN BURGOS","meses":{"2025-12":{"label":"DICIEMBRE 2025","htt":276.0,"hd":276.0,"hn":0.0,"ingresos":3861240,"neto":3861240},"2026-01":{"label":"ENERO 2026","htt":276.0,"hd":276.0,"hn":0.0,"ingresos":3861240,"neto":3541110},"2026-02":{"label":"FEBRERO 2026","htt":228.0,"hd":228.0,"hn":0.0,"ingresos":3189720,"neto":2902645}}},{"nombre":"KAREN PEREIRA","meses":{"2026-01":{"label":"ENERO 2026","htt":132.0,"hd":132.0,"hn":0.0,"ingresos":1846680,"neto":1838347}}},{"nombre":"KARLOS PAREDES","meses":{"2025-12":{"label":"DICIEMBRE 2025","htt":156.0,"hd":126.0,"hn":30.0,"ingresos":2308140,"neto":2026089},"2026-01":{"label":"ENERO 2026","htt":220.0,"hd":170.0,"hn":50.0,"ingresos":3287300,"neto":2991443},"2026-02":{"label":"FEBRERO 2026","htt":176.0,"hd":135.0,"hn":41.0,"ingresos":2634030,"neto":2396967}}},{"nombre":"KEVIN GONZALEZ","meses":{"2025-11":{"label":"NOVIEMBRE 2025","htt":168.5,"hd":168.5,"hn":0.0,"ingresos":2357315,"neto":2070838},"2025-12":{"label":"DICIEMBRE 2025","htt":168.0,"hd":168.0,"hn":0.0,"ingresos":2350320,"neto":2063074},"2026-01":{"label":"ENERO 2026","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2853960,"neto":2597103},"2026-02":{"label":"FEBRERO 2026","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3357600,"neto":3018257}}},{"nombre":"LOPEZ GUANES TALIA JAZMIN","meses":{"2025-02":{"label":"FEBRERO 2025","htt":140.5,"hd":140.5,"hn":0.0,"ingresos":1896750,"neto":1726042},"2025-03":{"label":"MARZO 2025","htt":205.0,"hd":205.0,"hn":0.0,"ingresos":2907415,"neto":2658340},"2025-04":{"label":"ABRIL 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2569915,"neto":2351215},"2025-05":{"label":"MAYO 2025","htt":191.5,"hd":191.5,"hn":0.0,"ingresos":2725165,"neto":2492492},"2025-06":{"label":"JUNIO 2025","htt":228.0,"hd":228.0,"hn":0.0,"ingresos":3334672,"neto":3047597},"2025-07":{"label":"JULIO 2025","htt":228.0,"hd":228.0,"hn":0.0,"ingresos":3334672,"neto":3047597},"2025-08":{"label":"AGOSTO 2025","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2998912,"neto":2667738},"2025-09":{"label":"SEPTIEMBRE 2025","htt":217.5,"hd":217.5,"hn":0.0,"ingresos":3187777,"neto":2839605},"2025-10":{"label":"OCTUBRE 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3502552,"neto":3200368},"2025-11":{"label":"NOVIEMBRE 2025","htt":205.0,"hd":205.0,"hn":0.0,"ingresos":3012902,"neto":2754786},"2025-12":{"label":"DICIEMBRE 2025","htt":216.0,"hd":216.0,"hn":0.0,"ingresos":3166792,"neto":2892727},"2026-01":{"label":"ENERO 2026","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2998912,"neto":2742056},"2026-02":{"label":"FEBRERO 2026","htt":240.0,"hd":230.0,"hn":10.0,"ingresos":3544452,"neto":3238497}}},{"nombre":"MANCIA BENÍTEZ NACER AMADO","meses":{"2025-01":{"label":"ENERO 2025","htt":216.5,"hd":126.5,"hn":90.0,"ingresos":3567080,"neto":3271228},"2025-02":{"label":"FEBRERO 2025","htt":48.0,"hd":28.0,"hn":20.0,"ingresos":1008830,"neto":943220},"2025-03":{"label":"MARZO 2025","htt":156.0,"hd":96.0,"hn":60.0,"ingresos":2628830,"neto":2417420},"2025-04":{"label":"ABRIL 2025","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3357830,"neto":3080810},"2025-05":{"label":"MAYO 2025","htt":72.0,"hd":42.0,"hn":30.0,"ingresos":1093500,"neto":1093500}}},{"nombre":"MANUEL  DEJESUS ROTELA","meses":{"2025-01":{"label":"ENERO 2025","htt":312.0,"hd":192.0,"hn":120.0,"ingresos":4698000,"neto":4383000},"2025-02":{"label":"FEBRERO 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4738500,"neto":4738500}}},{"nombre":"MARIA BELEN VARGAS","meses":{"2025-01":{"label":"ENERO 2025","htt":108.0,"hd":108.0,"hn":0.0,"ingresos":1458000,"neto":1458000}}},{"nombre":"MARIO JOAQUIN ECHAGUE OJEDA","meses":{"2025-03":{"label":"MARZO 2025","htt":117.0,"hd":117.0,"hn":0.0,"ingresos":1579500,"neto":1579500},"2025-04":{"label":"ABRIL 2025","htt":170.0,"hd":160.0,"hn":10.0,"ingresos":2335500,"neto":2261182},"2025-05":{"label":"MAYO 2025","htt":166.5,"hd":156.5,"hn":10.0,"ingresos":2288250,"neto":2213932},"2025-06":{"label":"JUNIO 2025","htt":278.0,"hd":187.0,"hn":91.0,"ingresos":4270510,"neto":3888844},"2025-07":{"label":"JULIO 2025","htt":278.0,"hd":187.0,"hn":91.0,"ingresos":4270510,"neto":3888844},"2025-08":{"label":"AGOSTO 2025","htt":288.0,"hd":178.0,"hn":110.0,"ingresos":4490020,"neto":4108354},"2025-09":{"label":"SEPTIEMBRE 2025","htt":288.0,"hd":178.0,"hn":110.0,"ingresos":4490020,"neto":4175020},"2025-10":{"label":"OCTUBRE 2025","htt":288.0,"hd":178.0,"hn":110.0,"ingresos":4490020,"neto":4175020},"2025-11":{"label":"NOVIEMBRE 2025","htt":300.0,"hd":180.0,"hn":120.0,"ingresos":4699800,"neto":4384800},"2025-12":{"label":"DICIEMBRE 2025","htt":264.0,"hd":164.0,"hn":100.0,"ingresos":4112360,"neto":3797360},"2026-01":{"label":"ENERO 2026","htt":261.0,"hd":171.0,"hn":90.0,"ingresos":4028490,"neto":3647062},"2026-02":{"label":"FEBRERO 2026","htt":233.0,"hd":153.0,"hn":80.0,"ingresos":3594870,"neto":3279870}}},{"nombre":"MARTINEZ CARBALLO DIEGO ANTONIO","meses":{"2025-01":{"label":"ENERO 2025","htt":220.0,"hd":168.0,"hn":52.0,"ingresos":3320515,"neto":3034261},"2025-02":{"label":"FEBRERO 2025","htt":298.0,"hd":233.0,"hn":65.0,"ingresos":4426165,"neto":4111165},"2025-03":{"label":"MARZO 2025","htt":311.0,"hd":219.0,"hn":92.0,"ingresos":4711015,"neto":4396015},"2025-04":{"label":"ABRIL 2025","htt":342.0,"hd":249.0,"hn":93.0,"ingresos":5133565,"neto":4818565},"2025-05":{"label":"MAYO 2025","htt":314.0,"hd":213.0,"hn":101.0,"ingresos":4787965,"neto":4472965},"2025-06":{"label":"JUNIO 2025","htt":324.0,"hd":214.0,"hn":110.0,"ingresos":5138612,"neto":4682628},"2025-07":{"label":"JULIO 2025","htt":324.0,"hd":214.0,"hn":110.0,"ingresos":5138612,"neto":4682628},"2025-08":{"label":"AGOSTO 2025","htt":331.0,"hd":210.5,"hn":120.5,"ingresos":5280537,"neto":4898871},"2025-09":{"label":"SEPTIEMBRE 2025","htt":300.0,"hd":188.0,"hn":112.0,"ingresos":4811232,"neto":4496232},"2025-10":{"label":"OCTUBRE 2025","htt":324.0,"hd":214.0,"hn":110.0,"ingresos":5138612,"neto":4823612},"2025-11":{"label":"NOVIEMBRE 2025","htt":285.5,"hd":185.5,"hn":100.0,"ingresos":4558097,"neto":4243097},"2025-12":{"label":"DICIEMBRE 2025","htt":300.0,"hd":190.0,"hn":110.0,"ingresos":4802852,"neto":4487852},"2026-01":{"label":"ENERO 2026","htt":172.0,"hd":112.0,"hn":60.0,"ingresos":2802632,"neto":2549451},"2026-02":{"label":"FEBRERO 2026","htt":276.0,"hd":176.0,"hn":100.0,"ingresos":4425192,"neto":4110192}}},{"nombre":"MENDOZA BAEZ, MARIO ROBERTO","meses":{"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3402000,"neto":3095820},"2025-05":{"label":"MAYO 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3379915,"neto":3088315},"2025-06":{"label":"JUNIO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2831032,"neto":2589285},"2025-07":{"label":"JULIO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2831032,"neto":2589285},"2025-08":{"label":"AGOSTO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2663152,"neto":2436514},"2025-09":{"label":"SEPTIEMBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2663152,"neto":2423468},"2025-10":{"label":"OCTUBRE 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2831032,"neto":2589285},"2025-11":{"label":"NOVIEMBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2663152,"neto":2436514},"2025-12":{"label":"DICIEMBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2663152,"neto":2436514},"2026-01":{"label":"ENERO 2026","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2831032,"neto":2575295},"2026-02":{"label":"FEBRERO 2026","htt":156.0,"hd":156.0,"hn":0.0,"ingresos":2327392,"neto":2130972}}},{"nombre":"MIGUEL CARBALLO","meses":{"2025-03":{"label":"MARZO 2025","htt":14.0,"hd":13.0,"hn":1.0,"ingresos":193050,"neto":193050},"2025-04":{"label":"ABRIL 2025","htt":138.0,"hd":95.0,"hn":43.0,"ingresos":2037150,"neto":1962832},"2025-05":{"label":"MAYO 2025","htt":146.0,"hd":102.0,"hn":44.0,"ingresos":2149200,"neto":2074882},"2025-06":{"label":"JUNIO 2025","htt":154.0,"hd":108.0,"hn":46.0,"ingresos":2347200,"neto":2061634},"2025-07":{"label":"JULIO 2025","htt":154.0,"hd":108.0,"hn":46.0,"ingresos":2347200,"neto":2061634},"2025-08":{"label":"AGOSTO 2025","htt":124.0,"hd":82.0,"hn":42.0,"ingresos":1910740,"neto":1738773},"2025-09":{"label":"SEPTIEMBRE 2025","htt":126.0,"hd":92.0,"hn":34.0,"ingresos":1905200,"neto":1646459},"2025-10":{"label":"OCTUBRE 2025","htt":138.0,"hd":95.0,"hn":43.0,"ingresos":2110790,"neto":1833545},"2025-11":{"label":"NOVIEMBRE 2025","htt":109.0,"hd":68.0,"hn":41.0,"ingresos":1696700,"neto":1543997},"2025-12":{"label":"DICIEMBRE 2025","htt":66.0,"hd":53.0,"hn":13.0,"ingresos":977810,"neto":889807}}},{"nombre":"NATALIA VIVIANA TORRES BRITEZ","meses":{"2025-01":{"label":"ENERO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2430000,"neto":2211300},"2025-02":{"label":"FEBRERO 2025","htt":156.0,"hd":156.0,"hn":0.0,"ingresos":2106000,"neto":1916460},"2025-03":{"label":"MARZO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2592000,"neto":2358720},"2025-04":{"label":"ABRIL 2025","htt":168.0,"hd":168.0,"hn":0.0,"ingresos":2268000,"neto":2063880},"2025-05":{"label":"MAYO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2430000,"neto":2211300},"2025-06":{"label":"JUNIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-07":{"label":"JULIO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-08":{"label":"AGOSTO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3210480},"2025-09":{"label":"SEPTIEMBRE 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3357600,"neto":3055416},"2025-10":{"label":"OCTUBRE 2025","htt":234.5,"hd":234.5,"hn":0.0,"ingresos":3280655,"neto":2985396},"2025-11":{"label":"NOVIEMBRE 2025","htt":144.0,"hd":144.0,"hn":0.0,"ingresos":2014560,"neto":1833249}}},{"nombre":"NELSON BAREIRO","meses":{"2025-08":{"label":"AGOSTO 2025","htt":48.0,"hd":28.0,"hn":20.0,"ingresos":755320,"neto":755320},"2025-09":{"label":"SEPTIEMBRE 2025","htt":235.5,"hd":229.5,"hn":6.0,"ingresos":3319785,"neto":3021004},"2025-10":{"label":"OCTUBRE 2025","htt":361.5,"hd":338.0,"hn":23.5,"ingresos":5155850,"neto":4838985},"2025-11":{"label":"NOVIEMBRE 2025","htt":254.0,"hd":241.0,"hn":13.0,"ingresos":3607930,"neto":3291997},"2025-12":{"label":"DICIEMBRE 2025","htt":166.5,"hd":156.0,"hn":10.5,"ingresos":2373330,"neto":2159730},"2026-01":{"label":"ENERO 2026","htt":219.5,"hd":219.5,"hn":0.0,"ingresos":3070805,"neto":2708219},"2026-02":{"label":"FEBRERO 2026","htt":272.0,"hd":264.0,"hn":8.0,"ingresos":3838800,"neto":3486641}}},{"nombre":"OCAMPO BRITEZ JOSE DAVID","meses":{"2025-01":{"label":"ENERO 2025","htt":262.5,"hd":160.5,"hn":102.0,"ingresos":3956850,"neto":3641850},"2025-02":{"label":"FEBRERO 2025","htt":216.0,"hd":144.0,"hn":72.0,"ingresos":3207600,"neto":2918916},"2025-03":{"label":"MARZO 2025","htt":214.5,"hd":122.5,"hn":92.0,"ingresos":3268350,"neto":2972643},"2025-04":{"label":"ABRIL 2025","htt":190.0,"hd":109.0,"hn":81.0,"ingresos":2893050,"neto":2632675},"2025-05":{"label":"MAYO 2025","htt":144.0,"hd":83.0,"hn":61.0,"ingresos":2191050,"neto":1993855},"2025-06":{"label":"JUNIO 2025","htt":240.0,"hd":148.0,"hn":92.0,"ingresos":3743080,"neto":3287096},"2025-07":{"label":"JULIO 2025","htt":240.0,"hd":148.0,"hn":92.0,"ingresos":3743080,"neto":3287096},"2025-08":{"label":"AGOSTO 2025","htt":179.5,"hd":108.0,"hn":71.5,"ingresos":2810790,"neto":2491152},"2025-09":{"label":"SEPTIEMBRE 2025","htt":216.5,"hd":135.5,"hn":81.0,"ingresos":3368225,"neto":3065084},"2025-10":{"label":"OCTUBRE 2025","htt":252.5,"hd":151.5,"hn":101.0,"ingresos":3955665,"neto":3638333},"2025-11":{"label":"NOVIEMBRE 2025","htt":180.5,"hd":111.5,"hn":69.0,"ingresos":2814305,"neto":2561017},"2025-12":{"label":"DICIEMBRE 2025","htt":206.0,"hd":125.0,"hn":81.0,"ingresos":3221330,"neto":2931410},"2026-01":{"label":"ENERO 2026","htt":203.0,"hd":123.0,"hn":80.0,"ingresos":3175170,"neto":2874603},"2026-02":{"label":"FEBRERO 2026","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3398940,"neto":3093035}}},{"nombre":"OSCAR MANUEL BARRIOS DUARTE","meses":{"2025-01":{"label":"ENERO 2025","htt":240.0,"hd":240.0,"hn":0.0,"ingresos":3240000,"neto":2941404},"2025-02":{"label":"FEBRERO 2025","htt":228.0,"hd":228.0,"hn":0.0,"ingresos":3078000,"neto":2800980},"2025-03":{"label":"MARZO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3402000,"neto":3095820}}},{"nombre":"OSVALDO AGUILAR","meses":{"2025-12":{"label":"DICIEMBRE 2025","htt":24.0,"hd":24.0,"hn":0.0,"ingresos":335760,"neto":305541},"2026-01":{"label":"ENERO 2026","htt":12.0,"hd":12.0,"hn":0.0,"ingresos":167880,"neto":167880},"2026-02":{"label":"FEBRERO 2026","htt":31.0,"hd":28.0,"hn":3.0,"ingresos":446260,"neto":406096}}},{"nombre":"PAOLA ELIZABETH GAYOSO CABRERA","meses":{"2025-01":{"label":"ENERO 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":1822500,"neto":1622500},"2025-02":{"label":"FEBRERO 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":1822500,"neto":1622500},"2025-03":{"label":"MARZO 2025","htt":132.0,"hd":82.0,"hn":50.0,"ingresos":1984500,"neto":1784500},"2025-04":{"label":"ABRIL 2025","htt":180.0,"hd":100.0,"hn":80.0,"ingresos":2754000,"neto":2506140},"2025-05":{"label":"MAYO 2025","htt":180.0,"hd":100.0,"hn":80.0,"ingresos":2754000,"neto":2506140},"2025-06":{"label":"JUNIO 2025","htt":254.0,"hd":134.0,"hn":120.0,"ingresos":4056260,"neto":3592624},"2025-07":{"label":"JULIO 2025","htt":254.0,"hd":134.0,"hn":120.0,"ingresos":4056260,"neto":3592624},"2025-08":{"label":"AGOSTO 2025","htt":272.5,"hd":138.5,"hn":134.0,"ingresos":4373735,"neto":3984417},"2025-09":{"label":"SEPTIEMBRE 2025","htt":255.5,"hd":135.5,"hn":120.0,"ingresos":4077245,"neto":3762245},"2025-10":{"label":"OCTUBRE 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3398940,"neto":3093035},"2025-11":{"label":"NOVIEMBRE 2025","htt":252.0,"hd":162.0,"hn":90.0,"ingresos":3902580,"neto":3587580},"2025-12":{"label":"DICIEMBRE 2025","htt":298.0,"hd":189.0,"hn":109.0,"ingresos":4625730,"neto":4310730},"2026-01":{"label":"ENERO 2026","htt":217.0,"hd":117.0,"hn":100.0,"ingresos":3454830,"neto":3143895},"2026-02":{"label":"FEBRERO 2026","htt":201.0,"hd":112.0,"hn":89.0,"ingresos":3184900,"neto":2898259}}},{"nombre":"PAVON MENDEZ ROCIO ELIZABETH","meses":{"2025-01":{"label":"ENERO 2025","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3217915,"neto":2940895},"2025-02":{"label":"FEBRERO 2025","htt":192.0,"hd":112.0,"hn":80.0,"ingresos":3055915,"neto":2793475},"2025-03":{"label":"MARZO 2025","htt":228.0,"hd":138.0,"hn":90.0,"ingresos":3582415,"neto":3272590},"2025-04":{"label":"ABRIL 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3420415,"neto":3125170},"2025-05":{"label":"MAYO 2025","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3217915,"neto":2940895},"2025-06":{"label":"JUNIO 2025","htt":199.5,"hd":129.5,"hn":70.0,"ingresos":3229257,"neto":2871726},"2025-07":{"label":"JULIO 2025","htt":199.5,"hd":129.5,"hn":70.0,"ingresos":3229257,"neto":2871726},"2025-08":{"label":"AGOSTO 2025","htt":240.0,"hd":160.0,"hn":80.0,"ingresos":3837752,"neto":3522752},"2025-09":{"label":"SEPTIEMBRE 2025","htt":214.5,"hd":134.5,"hn":80.0,"ingresos":3481007,"neto":3167716},"2025-10":{"label":"OCTUBRE 2025","htt":240.0,"hd":150.0,"hn":90.0,"ingresos":3879652,"neto":3562553},"2025-11":{"label":"NOVIEMBRE 2025","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3334112,"neto":3045223},"2025-12":{"label":"DICIEMBRE 2025","htt":192.0,"hd":122.0,"hn":70.0,"ingresos":3124332,"neto":2850126},"2026-01":{"label":"ENERO 2026","htt":240.0,"hd":150.0,"hn":90.0,"ingresos":3879652,"neto":3497751},"2026-02":{"label":"FEBRERO 2026","htt":192.0,"hd":112.0,"hn":80.0,"ingresos":3166232,"neto":2894317}}},{"nombre":"PEDRO ARGUELLO","meses":{"2025-11":{"label":"NOVIEMBRE 2025","htt":193.0,"hd":193.0,"hn":0.0,"ingresos":2700070,"neto":2382745},"2025-12":{"label":"DICIEMBRE 2025","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2853960,"neto":2522785},"2026-01":{"label":"ENERO 2026","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3525480,"neto":3140530},"2026-02":{"label":"FEBRERO 2026","htt":216.0,"hd":216.0,"hn":0.0,"ingresos":3021840,"neto":2749874}}},{"nombre":"PEDRO PEREZ","meses":{"2025-12":{"label":"DICIEMBRE 2025","htt":214.0,"hd":161.0,"hn":53.0,"ingresos":3215930,"neto":2852178},"2026-01":{"label":"ENERO 2026","htt":307.0,"hd":297.0,"hn":10.0,"ingresos":4336830,"neto":3947512},"2026-02":{"label":"FEBRERO 2026","htt":239.0,"hd":217.0,"hn":22.0,"ingresos":3435790,"neto":3126568}}},{"nombre":"PEDRO RAMON AGUAYO BENEGAS","meses":{"2025-03":{"label":"MARZO 2025","htt":156.0,"hd":96.0,"hn":60.0,"ingresos":2349000,"neto":2349000},"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":162.0,"hn":90.0,"ingresos":3766500,"neto":3722864},"2025-05":{"label":"MAYO 2025","htt":228.0,"hd":148.0,"hn":80.0,"ingresos":3402000,"neto":3358364}}},{"nombre":"PEÑA VERA JULIO CESAR","meses":{"2025-01":{"label":"ENERO 2025","htt":300.0,"hd":180.0,"hn":120.0,"ingresos":4536000,"neto":4221000},"2025-02":{"label":"FEBRERO 2025","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4374000,"neto":4059000},"2025-03":{"label":"MARZO 2025","htt":336.0,"hd":196.0,"hn":140.0,"ingresos":5103000,"neto":4788000},"2025-04":{"label":"ABRIL 2025","htt":281.5,"hd":161.5,"hn":120.0,"ingresos":4286250,"neto":3971250},"2025-05":{"label":"MAYO 2025","htt":336.0,"hd":196.0,"hn":140.0,"ingresos":5103000,"neto":4788000},"2025-06":{"label":"JUNIO 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4909580,"neto":4453596},"2025-07":{"label":"JULIO 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4909580,"neto":4453596},"2025-08":{"label":"AGOSTO 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4909580,"neto":4527914},"2025-09":{"label":"SEPTIEMBRE 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4909580,"neto":4594580},"2025-10":{"label":"OCTUBRE 2025","htt":311.0,"hd":181.0,"hn":130.0,"ingresos":4895590,"neto":4580590},"2025-11":{"label":"NOVIEMBRE 2025","htt":312.0,"hd":182.0,"hn":130.0,"ingresos":4909580,"neto":4594580},"2025-12":{"label":"DICIEMBRE 2025","htt":305.0,"hd":182.0,"hn":123.0,"ingresos":4993520,"neto":4678520},"2026-01":{"label":"ENERO 2026","htt":303.0,"hd":183.0,"hn":120.0,"ingresos":4741770,"neto":4416165},"2026-02":{"label":"FEBRERO 2026","htt":288.0,"hd":168.0,"hn":120.0,"ingresos":4531920,"neto":4216920}}},{"nombre":"RAFAEL GUTIERREZ BENITEZ","meses":{"2025-01":{"label":"ENERO 2025","htt":216.0,"hd":216.0,"hn":0.0,"ingresos":2916000,"neto":2645592},"2025-02":{"label":"FEBRERO 2025","htt":216.0,"hd":216.0,"hn":0.0,"ingresos":2916000,"neto":2653560},"2025-03":{"label":"MARZO 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3402000,"neto":3065116}}},{"nombre":"RICARDO GOMEZ","meses":{"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":252.0,"hn":0.0,"ingresos":3402000,"neto":3095820},"2025-05":{"label":"MAYO 2025","htt":264.0,"hd":264.0,"hn":0.0,"ingresos":3564000,"neto":3249000},"2025-06":{"label":"JUNIO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2025-07":{"label":"JULIO 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2025-08":{"label":"AGOSTO 2025","htt":192.0,"hd":192.0,"hn":0.0,"ingresos":2686080,"neto":2444332},"2025-09":{"label":"SEPTIEMBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2025-10":{"label":"OCTUBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2025-11":{"label":"NOVIEMBRE 2025","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2025-12":{"label":"DICIEMBRE 2025","htt":204.0,"hd":204.0,"hn":0.0,"ingresos":2853960,"neto":2597103},"2026-01":{"label":"ENERO 2026","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562},"2026-02":{"label":"FEBRERO 2026","htt":180.0,"hd":180.0,"hn":0.0,"ingresos":2518200,"neto":2291562}}},{"nombre":"RICARDO RAMON PEÑA FERNANDEZ","meses":{"2025-01":{"label":"ENERO 2025","htt":106.5,"hd":106.5,"hn":0.0,"ingresos":1581525,"neto":1518959},"2025-02":{"label":"FEBRERO 2025","htt":7.0,"hd":7.0,"hn":0.0,"ingresos":103950,"neto":103950}}},{"nombre":"RICHARD RAFAEL GUERRERO FERNANDEZ","meses":{"2025-01":{"label":"ENERO 2025","htt":264.0,"hd":164.0,"hn":100.0,"ingresos":4108915,"neto":3793915},"2025-02":{"label":"FEBRERO 2025","htt":227.0,"hd":147.0,"hn":80.0,"ingresos":3528415,"neto":3218203},"2025-03":{"label":"MARZO 2025","htt":192.0,"hd":112.0,"hn":80.0,"ingresos":3055915,"neto":2783176},"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":152.0,"hn":100.0,"ingresos":3946915,"neto":3631915},"2025-05":{"label":"MAYO 2025","htt":264.0,"hd":154.0,"hn":110.0,"ingresos":4149415,"neto":3834415},"2025-06":{"label":"JUNIO 2025","htt":335.0,"hd":215.0,"hn":120.0,"ingresos":5334402,"neto":4878418},"2025-07":{"label":"JULIO 2025","htt":335.0,"hd":215.0,"hn":120.0,"ingresos":5334402,"neto":4878418},"2025-08":{"label":"AGOSTO 2025","htt":266.5,"hd":176.0,"hn":90.5,"ingresos":4252482,"neto":3870816},"2025-09":{"label":"SEPTIEMBRE 2025","htt":322.5,"hd":213.5,"hn":109.0,"ingresos":5113437,"neto":4798437},"2025-10":{"label":"OCTUBRE 2025","htt":246.0,"hd":156.0,"hn":90.0,"ingresos":3963592,"neto":3648592},"2025-11":{"label":"NOVIEMBRE 2025","htt":264.0,"hd":174.0,"hn":90.0,"ingresos":4215412,"neto":3900412},"2025-12":{"label":"DICIEMBRE 2025","htt":84.0,"hd":54.0,"hn":30.0,"ingresos":1445812,"neto":1328735},"2026-01":{"label":"ENERO 2026","htt":300.0,"hd":200.0,"hn":100.0,"ingresos":4760952,"neto":4385473},"2026-02":{"label":"FEBRERO 2026","htt":288.0,"hd":188.0,"hn":100.0,"ingresos":4593072,"neto":4278072}}},{"nombre":"RODRIGO AGÜERO","meses":{"2025-06":{"label":"JUNIO 2025","htt":132.0,"hd":132.0,"hn":0.0,"ingresos":1846680,"neto":1606160},"2025-07":{"label":"JULIO 2025","htt":132.0,"hd":132.0,"hn":0.0,"ingresos":1846680,"neto":1606160},"2025-08":{"label":"AGOSTO 2025","htt":274.5,"hd":270.5,"hn":4.0,"ingresos":3857015,"neto":3397176},"2025-09":{"label":"SEPTIEMBRE 2025","htt":232.0,"hd":228.0,"hn":4.0,"ingresos":3262440,"neto":2840070},"2025-10":{"label":"OCTUBRE 2025","htt":280.0,"hd":277.0,"hn":3.0,"ingresos":3929770,"neto":3608241},"2025-11":{"label":"NOVIEMBRE 2025","htt":228.0,"hd":216.0,"hn":12.0,"ingresos":3384952,"neto":3092186},"2025-12":{"label":"DICIEMBRE 2025","htt":161.0,"hd":148.0,"hn":13.0,"ingresos":2451812,"neto":2243262},"2026-01":{"label":"ENERO 2026","htt":224.0,"hd":209.5,"hn":14.5,"ingresos":3339467,"neto":2929599},"2026-02":{"label":"FEBRERO 2026","htt":259.8,"hd":210.8,"hn":49.0,"ingresos":3984864,"neto":3669864}}},{"nombre":"ROISA JARA","meses":{"2026-02":{"label":"FEBRERO 2026","htt":12.0,"hd":12.0,"hn":0.0,"ingresos":167880,"neto":167880}}},{"nombre":"ROJAS BARBOZA HENRY NELSON","meses":{"2025-01":{"label":"ENERO 2025","htt":72.0,"hd":42.0,"hn":30.0,"ingresos":1513246,"neto":1414831},"2025-02":{"label":"FEBRERO 2025","htt":156.0,"hd":96.0,"hn":60.0,"ingresos":2768746,"neto":2557336},"2025-03":{"label":"MARZO 2025","htt":72.0,"hd":52.0,"hn":20.0,"ingresos":1053000,"neto":958230}}},{"nombre":"SALZA CHIARA","meses":{"2025-04":{"label":"ABRIL 2025","htt":12.0,"hd":12.0,"hn":0.0,"ingresos":162000,"neto":162000}}},{"nombre":"SAMUEL RAMON MONTIEL VERON","meses":{"2025-01":{"label":"ENERO 2025","htt":216.0,"hd":126.0,"hn":90.0,"ingresos":3280500,"neto":2985255},"2025-02":{"label":"FEBRERO 2025","htt":236.5,"hd":146.5,"hn":90.0,"ingresos":3557250,"neto":1742250},"2025-03":{"label":"MARZO 2025","htt":240.0,"hd":140.0,"hn":100.0,"ingresos":3645000,"neto":1830000},"2025-04":{"label":"ABRIL 2025","htt":252.0,"hd":152.0,"hn":100.0,"ingresos":3807000,"neto":1992000},"2025-05":{"label":"MAYO 2025","htt":246.5,"hd":146.5,"hn":100.0,"ingresos":3732750,"neto":1917750},"2025-06":{"label":"JUNIO 2025","htt":308.5,"hd":190.0,"hn":118.5,"ingresos":4812430,"neto":2438761},"2025-07":{"label":"JULIO 2025","htt":308.5,"hd":190.0,"hn":118.5,"ingresos":4812430,"neto":2438761},"2025-08":{"label":"AGOSTO 2025","htt":276.0,"hd":176.0,"hn":100.0,"ingresos":4280240,"neto":2386916},"2025-09":{"label":"SEPTIEMBRE 2025","htt":240.0,"hd":150.0,"hn":90.0,"ingresos":3734700,"neto":1919700},"2025-10":{"label":"OCTUBRE 2025","htt":312.0,"hd":192.0,"hn":120.0,"ingresos":4867680,"neto":3052680},"2025-11":{"label":"NOVIEMBRE 2025","htt":240.0,"hd":160.0,"hn":80.0,"ingresos":3692800,"neto":1229800},"2025-12":{"label":"DICIEMBRE 2025","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3189160,"neto":1402135},"2026-01":{"label":"ENERO 2026","htt":228.0,"hd":148.0,"hn":80.0,"ingresos":3524920,"neto":1597344},"2026-02":{"label":"FEBRERO 2026","htt":204.0,"hd":124.0,"hn":80.0,"ingresos":3189160,"neto":1402135}}},{"nombre":"SANDOVAL CHAPARRO GUSTAVO RAÚL","meses":{"2025-01":{"label":"ENERO 2025","htt":73.0,"hd":43.0,"hn":30.0,"ingresos":1217700,"neto":1184490},"2025-02":{"label":"FEBRERO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1603800,"neto":1557728},"2025-03":{"label":"MARZO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1603800,"neto":1560060},"2025-04":{"label":"ABRIL 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":2004750,"neto":1950075},"2025-05":{"label":"MAYO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1603800,"neto":1560060},"2025-06":{"label":"JUNIO 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":2077130,"neto":1953815},"2025-07":{"label":"JULIO 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":2077130,"neto":1953815},"2025-08":{"label":"AGOSTO 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1661704,"neto":1546454},"2025-09":{"label":"SEPTIEMBRE 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":2077130,"neto":2020481},"2025-10":{"label":"OCTUBRE 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1661704,"neto":1616384},"2025-11":{"label":"NOVIEMBRE 2025","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1661704,"neto":1616384},"2025-12":{"label":"DICIEMBRE 2025","htt":120.0,"hd":70.0,"hn":50.0,"ingresos":2077130,"neto":2020015},"2026-01":{"label":"ENERO 2026","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1661704,"neto":1616384},"2026-02":{"label":"FEBRERO 2026","htt":96.0,"hd":56.0,"hn":40.0,"ingresos":1661704,"neto":1616384}}},{"nombre":"SANTIAGO SORIA","meses":{"2025-08":{"label":"AGOSTO 2025","htt":8.0,"hd":2.0,"hn":6.0,"ingresos":137060,"neto":137060}}},{"nombre":"SANTOS BENITEZ EDGAR BIENVENIDO","meses":{"2025-01":{"label":"ENERO 2025","htt":344.0,"hd":298.0,"hn":46.0,"ingresos":4843800,"neto":4528800},"2025-02":{"label":"FEBRERO 2025","htt":280.0,"hd":186.0,"hn":94.0,"ingresos":4160700,"neto":3845700},"2025-03":{"label":"MARZO 2025","htt":330.0,"hd":288.0,"hn":42.0,"ingresos":4625100,"neto":4310100},"2025-04":{"label":"ABRIL 2025","htt":300.0,"hd":252.0,"hn":48.0,"ingresos":4244400,"neto":3929400},"2025-05":{"label":"MAYO 2025","htt":310.0,"hd":253.0,"hn":57.0,"ingresos":4415850,"neto":4100850},"2025-06":{"label":"JUNIO 2025","htt":330.0,"hd":283.0,"hn":47.0,"ingresos":4813630,"neto":4357646},"2025-07":{"label":"JULIO 2025","htt":330.0,"hd":283.0,"hn":47.0,"ingresos":4813630,"neto":4357646},"2025-08":{"label":"AGOSTO 2025","htt":403.0,"hd":301.0,"hn":102.0,"ingresos":6065350,"neto":5683684},"2025-09":{"label":"SEPTIEMBRE 2025","htt":309.0,"hd":265.0,"hn":44.0,"ingresos":4507270,"neto":4192270},"2025-10":{"label":"OCTUBRE 2025","htt":371.0,"hd":320.0,"hn":51.0,"ingresos":5403980,"neto":5088980},"2025-11":{"label":"NOVIEMBRE 2025","htt":400.0,"hd":334.0,"hn":66.0,"ingresos":5872540,"neto":5557540},"2025-12":{"label":"DICIEMBRE 2025","htt":334.0,"hd":291.0,"hn":43.0,"ingresos":4852830,"neto":4537830},"2026-01":{"label":"ENERO 2026","htt":369.0,"hd":305.0,"hn":64.0,"ingresos":5430470,"neto":5115470},"2026-02":{"label":"FEBRERO 2026","htt":323.0,"hd":278.0,"hn":45.0,"ingresos":4707320,"neto":4392320}}},{"nombre":"VALDEZ LARROSA BLAS ANTONIO","meses":{"2025-01":{"label":"ENERO 2025","htt":380.0,"hd":302.0,"hn":78.0,"ingresos":5445900,"neto":5130900},"2025-02":{"label":"FEBRERO 2025","htt":359.0,"hd":308.0,"hn":51.0,"ingresos":5053050,"neto":4663732},"2025-03":{"label":"MARZO 2025","htt":387.0,"hd":319.0,"hn":68.0,"ingresos":5499900,"neto":5110582},"2025-04":{"label":"ABRIL 2025","htt":356.5,"hd":296.5,"hn":60.0,"ingresos":5055750,"neto":4666432},"2025-05":{"label":"MAYO 2025","htt":326.0,"hd":265.0,"hn":61.0,"ingresos":4648050,"neto":4333050},"2025-06":{"label":"JUNIO 2025","htt":322.0,"hd":235.0,"hn":87.0,"ingresos":4869310,"neto":4413326},"2025-07":{"label":"JULIO 2025","htt":322.0,"hd":235.0,"hn":87.0,"ingresos":4869310,"neto":4413326},"2025-08":{"label":"AGOSTO 2025","htt":386.5,"hd":296.0,"hn":90.5,"ingresos":5786330,"neto":5404664},"2025-09":{"label":"SEPTIEMBRE 2025","htt":328.0,"hd":247.0,"hn":81.0,"ingresos":4928110,"neto":4613110},"2025-10":{"label":"OCTUBRE 2025","htt":380.0,"hd":285.0,"hn":95.0,"ingresos":5714250,"neto":5399250},"2025-11":{"label":"NOVIEMBRE 2025","htt":362.0,"hd":279.0,"hn":83.0,"ingresos":5412150,"neto":5097150},"2025-12":{"label":"DICIEMBRE 2025","htt":380.0,"hd":285.0,"hn":95.0,"ingresos":5714250,"neto":5399250},"2026-01":{"label":"ENERO 2026","htt":364.0,"hd":190.0,"hn":174.0,"ingresos":5821420,"neto":5506420},"2026-02":{"label":"FEBRERO 2026","htt":287.0,"hd":221.0,"hn":66.0,"ingresos":4291670,"neto":3976670}}}]};
+const PERIODOS = DATA.periodos;
+const PERSONAS = DATA.personas;
 
-/* ═══════════════════════════════ STATE ═══════════════════════════════ */
-let selectedMonths = new Set(ALL_PERIODOS);   // all selected by default
-let filterMode = 'all';
-let currentView = 'cards';
-let tblSortCol = 'nombre';
-let tblSortDir = 'asc';
-let charts = {};
+function fmt(n){ if(n===null||n===undefined) return 'Gs. —'; return 'Gs. ' + Math.round(n).toLocaleString('es-PY'); }
+function fmtH(n){ if(n===null||n===undefined) return '—'; return n.toFixed(1) + ' h'; }
+function getClass(v){ if(v===null||v===undefined) return 'neutral'; if(v>5) return 'up'; if(v<-5) return 'down'; return 'neutral'; }
 
-/* ═══════════════════════════════ HELPERS ═══════════════════════════════ */
-const fmt = n => n==null?'—':new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(n);
-const fmtM = n => n==null?'—':'Gs '+(n/1e6).toFixed(2)+'M';
-const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-
-function getActivePeriodos() {
-  return ALL_PERIODOS.filter(p => selectedMonths.has(p));
+function buildStats(){
+  const all = Object.values(PERSONAS);
+  const withVar = all.filter(p=>p.var_pct!==null);
+  const ups = withVar.filter(p=>p.var_pct>5).length;
+  const downs = withVar.filter(p=>p.var_pct<-5).length;
+  const stable = withVar.filter(p=>Math.abs(p.var_pct)<=5).length;
+  const totalAvg = all.reduce((s,p)=>s+p.avg_ing,0)/all.length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="val">${all.length}</div><div class="lbl">Total Guardias</div></div>
+    <div class="stat"><div class="val" style="color:var(--green)">${ups}</div><div class="lbl">Con Incremento</div></div>
+    <div class="stat"><div class="val" style="color:var(--red)">${downs}</div><div class="lbl">Con Baja</div></div>
+    <div class="stat"><div class="val" style="color:var(--muted)">${stable}</div><div class="lbl">Estables (±5%)</div></div>
+    <div class="stat"><div class="val">Gs. ${(totalAvg/1000000).toFixed(1)}M</div><div class="lbl">Ingreso Prom. General</div></div>`;
 }
 
-/* compute per-person aggregated data for selected months */
-function getPersonData(p) {
-  const active = getActivePeriodos();
-  const vals = active.map(per => p.meses[per]).filter(Boolean);
-  if (!vals.length) return null;
-  const totalIng = vals.reduce((s,v)=>s+v.ingresos,0);
-  const totalNeto = vals.reduce((s,v)=>s+v.neto,0);
-  const totalHtt = vals.reduce((s,v)=>s+v.htt,0);
-  // variation: first vs last month with data in active range
-  const withData = active.filter(per=>p.meses[per]);
-  let varPct = 0;
-  if (withData.length>=2) {
-    const first = p.meses[withData[0]].ingresos;
-    const last  = p.meses[withData[withData.length-1]].ingresos;
-    varPct = first>0 ? Math.round((last-first)/first*1000)/10 : 0;
-  }
-  return {totalIng,totalNeto,totalHtt,varPct,monthsCount:vals.length};
-}
+let activeFilter='all', activeSort='nombre', searchVal='';
+let miniCharts={};
 
-/* ═══════════════════════════════ MONTH PILLS ═══════════════════════════════ */
-function buildPills() {
-  const wrap = document.getElementById('month-pills');
-  wrap.innerHTML = `<span class="mpill pill-all active" onclick="toggleAllMonths(this)">Todos</span>` +
-    ALL_PERIODOS.map((p,i)=>`<span class="mpill active" data-p="${p}" onclick="toggleMonth(this,'${p}')">${ALL_LABELS[i]}</span>`).join('');
-}
+function buildCards(){
+  Object.values(miniCharts).forEach(c=>c.destroy()); miniCharts={};
+  let entries = Object.entries(PERSONAS).map(([k,v])=>({name:k,...v}));
+  if(searchVal) entries=entries.filter(e=>e.name.toLowerCase().includes(searchVal.toLowerCase()));
+  if(activeFilter==='up') entries=entries.filter(e=>e.var_pct!==null&&e.var_pct>5);
+  if(activeFilter==='down') entries=entries.filter(e=>e.var_pct!==null&&e.var_pct<-5);
+  if(activeFilter==='stable') entries=entries.filter(e=>e.var_pct!==null&&Math.abs(e.var_pct)<=5);
+  if(activeSort==='nombre') entries.sort((a,b)=>a.name.localeCompare(b.name));
+  if(activeSort==='var_desc') entries.sort((a,b)=>(b.var_pct||0)-(a.var_pct||0));
+  if(activeSort==='var_asc') entries.sort((a,b)=>(a.var_pct||0)-(b.var_pct||0));
+  if(activeSort==='avg_desc') entries.sort((a,b)=>b.avg_ing-a.avg_ing);
 
-function toggleAllMonths(el) {
-  const allActive = selectedMonths.size === ALL_PERIODOS.length;
-  if (allActive) {
-    selectedMonths.clear();
-    document.querySelectorAll('.mpill[data-p]').forEach(m=>m.classList.remove('active'));
-    el.textContent = 'Ninguno';
-  } else {
-    ALL_PERIODOS.forEach(p=>selectedMonths.add(p));
-    document.querySelectorAll('.mpill[data-p]').forEach(m=>m.classList.add('active'));
-    el.textContent = 'Todos';
-  }
-  updateSelInfo();
-  render();
-}
+  const grid=document.getElementById('grid');
+  if(!entries.length){grid.innerHTML='<div class="empty">No se encontraron guardias con los filtros aplicados.</div>';return;}
 
-function toggleMonth(el, p) {
-  if (selectedMonths.has(p)) {
-    selectedMonths.delete(p);
-    el.classList.remove('active');
-  } else {
-    selectedMonths.add(p);
-    el.classList.add('active');
-  }
-  const allEl = document.querySelector('.pill-all');
-  allEl.textContent = selectedMonths.size===ALL_PERIODOS.length?'Todos':`${selectedMonths.size} meses`;
-  if(selectedMonths.size===ALL_PERIODOS.length) allEl.classList.add('active'); else allEl.classList.remove('active');
-  updateSelInfo();
-  render();
-}
-
-function updateSelInfo() {
-  const n = selectedMonths.size;
-  const el = document.getElementById('sel-info');
-  if(n===ALL_PERIODOS.length) el.textContent='Todos los meses seleccionados';
-  else if(n===0) el.textContent='Ningún mes seleccionado';
-  else {
-    const names = ALL_PERIODOS.filter(p=>selectedMonths.has(p)).map(p=>ALL_LABELS[ALL_PERIODOS.indexOf(p)]);
-    el.textContent = names.join(', ');
-  }
-}
-
-/* ═══════════════════════════════ FILTER/SORT ═══════════════════════════════ */
-function setFilter(f, el) {
-  filterMode = f;
-  document.querySelectorAll('.fbtn').forEach(b=>b.className='fbtn');
-  el.classList.add(f==='up'?'fu':f==='down'?'fd':'fa');
-  render();
-}
-
-function getFiltered() {
-  const q = document.getElementById('search').value.toLowerCase().trim();
-  const sort = document.getElementById('sortby').value;
-  let list = RAW.personas.map(p=>{
-    const d = getPersonData(p);
-    return d ? {...p, _d:d} : null;
-  }).filter(Boolean);
-
-  if(q) list = list.filter(p=>p.nombre.toLowerCase().includes(q));
-  if(filterMode==='up')   list = list.filter(p=>p._d.varPct>0);
-  if(filterMode==='down') list = list.filter(p=>p._d.varPct<0);
-  if(filterMode==='high') list = list.filter(p=>Math.abs(p._d.varPct)>=20);
-
-  if(sort==='var-desc')  list.sort((a,b)=>b._d.varPct-a._d.varPct);
-  else if(sort==='var-asc') list.sort((a,b)=>a._d.varPct-b._d.varPct);
-  else if(sort==='ing-desc') list.sort((a,b)=>b._d.totalIng-a._d.totalIng);
-  else if(sort==='htt-desc') list.sort((a,b)=>b._d.totalHtt-a._d.totalHtt);
-  else list.sort((a,b)=>a.nombre.localeCompare(b.nombre));
-  return list;
-}
-
-/* ═══════════════════════════════ HEADER STATS ═══════════════════════════════ */
-function updateHeaderStats(list) {
-  document.getElementById('s-total').textContent = list.length;
-  document.getElementById('s-up').textContent = list.filter(p=>p._d.varPct>0).length;
-  document.getElementById('s-down').textContent = list.filter(p=>p._d.varPct<0).length;
-  const tot = list.reduce((s,p)=>s+p._d.totalIng,0);
-  document.getElementById('s-ing').textContent = (tot/1e9).toFixed(2)+'B';
-}
-
-/* ═══════════════════════════════ VIEW SWITCH ═══════════════════════════════ */
-function switchView(v) {
-  currentView = v;
-  document.getElementById('btn-cards').classList.toggle('active',v==='cards');
-  document.getElementById('btn-table').classList.toggle('active',v==='table');
-  document.getElementById('cards-view').style.display = v==='cards'?'':'none';
-  document.getElementById('table-view').style.display = v==='table'?'':'none';
-  render();
-}
-
-/* ═══════════════════════════════ MAIN RENDER ═══════════════════════════════ */
-function render() {
-  const list = getFiltered();
-  const rcount = document.getElementById('rcount');
-  rcount.innerHTML = `Mostrando <span>${list.length}</span> de ${RAW.personas.length} guardias &nbsp;·&nbsp; ${selectedMonths.size} meses seleccionados`;
-  updateHeaderStats(list);
-  if(currentView==='cards') renderCards(list);
-  else renderTable(list);
-}
-
-/* ═══════════════════════════════ CARDS ═══════════════════════════════ */
-function renderCards(list) {
-  Object.values(charts).forEach(c=>c.destroy()); charts={};
-  const grid = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  if(!list.length){grid.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-
-  const active = getActivePeriodos();
-  let globalMax=0;
-  RAW.personas.forEach(p=>active.forEach(per=>{const v=p.meses[per]?.ingresos??0;if(v>globalMax)globalMax=v;}));
-
-  grid.innerHTML = list.map(p=>{
-    const d=p._d; const id='c-'+slug(p.nombre);
-    const vc = d.varPct>0?'b-up':d.varPct<0?'b-down':'b-neutral';
-    const vs = d.varPct===0?'—':(d.varPct>0?'+':'')+d.varPct+'%';
-
-    const cells = active.map((per,i)=>{
-      const m=p.meses[per]; const idx=ALL_PERIODOS.indexOf(per);
-      if(!m) return `<div class="sp-cell empty"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">—</div><div class="sp-ing">—</div><div class="bar-bg"></div></div>`;
-      const pct=Math.round((m.ingresos/globalMax)*100);
-      const bc=d.varPct>=0?'#4fffb0':'#ff6b6b';
-      return `<div class="sp-cell"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">${m.htt}h</div><div class="sp-ing">${(m.ingresos/1e6).toFixed(2)}M</div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${bc}"></div></div></div>`;
-    }).join('');
-
-    return `<div class="card" id="${id}" onclick="toggleCard('${id}')">
-      <div class="card-hdr"><div class="card-name">${p.nombre}</div><span class="badge ${vc}">${vs}</span></div>
-      <div class="card-spark">${cells}</div>
-      <div class="card-detail" onclick="event.stopPropagation()">
-        <div class="det-stats">
-          <div class="dstat"><div class="dstat-val">${fmtM(d.totalIng)}</div><div class="dstat-lbl">Total Ingresos</div></div>
-          <div class="dstat"><div class="dstat-val">${fmtM(d.totalNeto)}</div><div class="dstat-lbl">Total Neto</div></div>
-          <div class="dstat"><div class="dstat-val">${d.totalHtt.toFixed(0)}h</div><div class="dstat-lbl">Total Horas</div></div>
-          <div class="dstat"><div class="dstat-val">${d.monthsCount}</div><div class="dstat-lbl">Meses activos</div></div>
-        </div>
-        <div class="det-tabs">
-          <button class="dtab active" data-t="ingresos" onclick="swTab('${id}','ingresos')">Ingresos</button>
-          <button class="dtab" data-t="neto" onclick="swTab('${id}','neto')">Neto</button>
-          <button class="dtab" data-t="horas" onclick="swTab('${id}','horas')">Horas</button>
-        </div>
-        <div class="chart-wrap"><canvas></canvas></div>
+  grid.innerHTML=entries.map(e=>{
+    const cls=getClass(e.var_pct);
+    const varStr=e.var_pct===null?'Sin datos suficientes':(e.var_pct>0?'+':'')+e.var_pct+'%';
+    const ingValid=e.ingresos.filter(x=>x!==null);
+    const hValid=e.horas.filter(x=>x!==null);
+    const lastIng=ingValid[ingValid.length-1];
+    const lastH=hValid[hValid.length-1];
+    const safeId='c_'+e.name.replace(/[^a-zA-Z0-9]/g,'_');
+    return `<div class="card ${cls}" data-name="${e.name}">
+      <div class="card-header">
+        <div class="card-name">${e.name}</div>
+        <span class="var-badge ${cls}">${varStr}</span>
       </div>
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="ms-val">${fmt(lastIng)}</div><div class="ms-lbl">Último ingreso</div></div>
+        <div class="mini-stat"><div class="ms-val">${fmtH(lastH)}</div><div class="ms-lbl">Últimas horas</div></div>
+        <div class="mini-stat"><div class="ms-val">Gs. ${(e.avg_ing/1000000).toFixed(1)}M</div><div class="ms-lbl">Prom. ingreso</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="${safeId}"></canvas></div>
     </div>`;
   }).join('');
-}
 
-function toggleCard(id) {
-  const card=document.getElementById(id); if(!card)return;
-  const was=card.classList.contains('expanded');
-  document.querySelectorAll('.card.expanded').forEach(c=>{
-    c.classList.remove('expanded');
-    if(charts[c.id]){charts[c.id].destroy();delete charts[c.id];}
+  entries.forEach(e=>{
+    const safeId='c_'+e.name.replace(/[^a-zA-Z0-9]/g,'_');
+    const canvas=document.getElementById(safeId); if(!canvas) return;
+    const chart=new Chart(canvas,{type:'line',data:{labels:PERIODOS,datasets:[
+      {label:'Ingresos',data:e.ingresos,borderColor:'#e8c547',backgroundColor:'rgba(232,197,71,.08)',pointBackgroundColor:'#e8c547',pointRadius:3,borderWidth:2,tension:.4,yAxisID:'y',spanGaps:false},
+      {label:'Horas',data:e.horas,borderColor:'#4fd1c5',backgroundColor:'rgba(79,209,197,.05)',pointBackgroundColor:'#4fd1c5',pointRadius:3,borderWidth:1.5,tension:.4,yAxisID:'y2',spanGaps:false,borderDash:[4,3]}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{x:{ticks:{color:'#718096',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{display:false},y2:{display:false}}}});
+    miniCharts[safeId]=chart;
   });
-  if(!was){card.classList.add('expanded');drawChart(id,'ingresos');}
-}
 
-function swTab(id,tab) {
-  const card=document.getElementById(id);
-  card.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
-  card.querySelector(`.dtab[data-t="${tab}"]`).classList.add('active');
-  if(charts[id]){charts[id].destroy();delete charts[id];}
-  drawChart(id,tab);
-}
-
-function drawChart(id,tab) {
-  const card=document.getElementById(id); if(!card)return;
-  const nombre=id.replace('c-','');
-  const p=RAW.personas.find(x=>slug(x.nombre)===nombre); if(!p)return;
-  const active=getActivePeriodos();
-  const labels=active.map(per=>ALL_LABELS[ALL_PERIODOS.indexOf(per)]);
-  const vals=active.map(per=>{
-    const m=p.meses[per];
-    if(!m)return null;
-    return tab==='horas'?m.htt:tab==='neto'?m.neto:m.ingresos;
-  });
-  const color=tab==='horas'?'#f7c948':tab==='neto'?'#a78bfa':'#4fffb0';
-  const lbl=tab==='horas'?'Horas':tab==='neto'?'Neto a Pagar':'Total Ingresos';
-  const isH=tab==='horas';
-  charts[id]=new Chart(card.querySelector('canvas').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[{label:lbl,data:vals,borderColor:color,backgroundColor:color+'18',borderWidth:2,pointBackgroundColor:color,pointRadius:4,fill:true,tension:.35,spanGaps:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1f2e',borderColor:'#252d3d',borderWidth:1,titleColor:'#e8eaf0',bodyColor:'#6b7494',padding:10,callbacks:{label:c=>isH?c.parsed.y+'h':'Gs '+fmt(c.parsed.y)}}},scales:{x:{grid:{color:'#1e2535'},ticks:{color:'#6b7494',font:{family:'DM Mono',size:9}}},y:{grid:{color:'#1e2535'},ticks:{color:'#6b7494',font:{family:'DM Mono',size:9},callback:v=>isH?v+'h':(v/1e6).toFixed(1)+'M'}}}}
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click',()=>openModal(card.dataset.name));
   });
 }
 
-/* ═══════════════════════════════ TABLE ═══════════════════════════════ */
-function renderTable(list) {
-  const tbl=document.getElementById('tbl');
-  const empt=document.getElementById('empty-tbl');
-  const active=getActivePeriodos();
-
-  if(!list.length){tbl.style.display='none';empt.style.display='block';return;}
-  tbl.style.display=''; empt.style.display='none';
-
-  // THEAD — columns: Nombre + one col per active month + Totals
-  const thMeses = active.map((per,i)=>`<th onclick="sortTable('ing-${per}')">${ALL_LABELS[ALL_PERIODOS.indexOf(per)]}</th>`).join('');
-  tbl.querySelector('thead').innerHTML=`<tr>
-    <th onclick="sortTable('nombre')" class="${tblSortCol==='nombre'?'sort-'+tblSortDir:''}">Guardia</th>
-    ${thMeses}
-    <th onclick="sortTable('totalIng')" class="${tblSortCol==='totalIng'?'sort-'+tblSortDir:''}">Total Ing.</th>
-    <th onclick="sortTable('totalNeto')" class="${tblSortCol==='totalNeto'?'sort-'+tblSortDir:''}">Total Neto</th>
-    <th onclick="sortTable('totalHtt')" class="${tblSortCol==='totalHtt'?'sort-'+tblSortDir:''}">Total Hs</th>
-    <th onclick="sortTable('varPct')" class="${tblSortCol==='varPct'?'sort-'+tblSortDir:''}">Variación</th>
-  </tr>`;
-
-  // Apply table sort
-  let sorted=[...list];
-  if(tblSortCol==='nombre') sorted.sort((a,b)=>tblSortDir==='asc'?a.nombre.localeCompare(b.nombre):b.nombre.localeCompare(a.nombre));
-  else if(tblSortCol==='totalIng') sorted.sort((a,b)=>tblSortDir==='asc'?a._d.totalIng-b._d.totalIng:b._d.totalIng-a._d.totalIng);
-  else if(tblSortCol==='totalNeto') sorted.sort((a,b)=>tblSortDir==='asc'?a._d.totalNeto-b._d.totalNeto:b._d.totalNeto-a._d.totalNeto);
-  else if(tblSortCol==='totalHtt') sorted.sort((a,b)=>tblSortDir==='asc'?a._d.totalHtt-b._d.totalHtt:b._d.totalHtt-a._d.totalHtt);
-  else if(tblSortCol==='varPct') sorted.sort((a,b)=>tblSortDir==='asc'?a._d.varPct-b._d.varPct:b._d.varPct-a._d.varPct);
-
-  // TBODY
-  tbl.querySelector('tbody').innerHTML = sorted.map(p=>{
-    const d=p._d;
-    const mesCells=active.map(per=>{
-      const m=p.meses[per];
-      return m?`<td>${(m.ingresos/1e6).toFixed(2)}M</td>`:`<td style="color:var(--muted2)">—</td>`;
-    }).join('');
-    const vc=d.varPct>0?'up':d.varPct<0?'down':'';
-    const vs=d.varPct===0?'—':(d.varPct>0?'+':'')+d.varPct+'%';
-    return `<tr>
-      <td title="${p.nombre}">${p.nombre}</td>
-      ${mesCells}
-      <td>${fmtM(d.totalIng)}</td>
-      <td class="td-neto">${fmtM(d.totalNeto)}</td>
-      <td>${d.totalHtt.toFixed(0)}h</td>
-      <td class="td-var ${vc}">${vs}</td>
-    </tr>`;
-  }).join('');
-
-  // TFOOT totals
-  const sumIng=sorted.reduce((s,p)=>s+p._d.totalIng,0);
-  const sumNeto=sorted.reduce((s,p)=>s+p._d.totalNeto,0);
-  const sumHtt=sorted.reduce((s,p)=>s+p._d.totalHtt,0);
-  const mesTotals=active.map(per=>{
-    const t=sorted.reduce((s,p)=>s+(p.meses[per]?.ingresos??0),0);
-    return `<td>${(t/1e6).toFixed(1)}M</td>`;
-  }).join('');
-  tbl.querySelector('tfoot').innerHTML=`<tr>
-    <td>TOTALES (${sorted.length} guardias)</td>
-    ${mesTotals}
-    <td>${fmtM(sumIng)}</td>
-    <td>${fmtM(sumNeto)}</td>
-    <td>${sumHtt.toFixed(0)}h</td>
-    <td>—</td>
-  </tr>`;
+let modalChartInst=null;
+function openModal(name){
+  const e=PERSONAS[name];
+  document.getElementById('modalName').textContent=name;
+  const cls=getClass(e.var_pct);
+  const varStr=e.var_pct===null?'Sin variación calculable':(e.var_pct>0?'▲ Incremento de +':'▼ Baja de ')+Math.abs(e.var_pct)+'% (primer al último mes con datos)';
+  document.getElementById('modalSub').textContent=varStr;
+  const rows=PERIODOS.map((p,i)=>`<tr>
+    <td>${p}</td>
+    <td>${e.horas[i]!==null?e.horas[i].toFixed(1)+' h':'<span class="null-val">sin datos</span>'}</td>
+    <td>${e.ingresos[i]!==null?'Gs. '+Math.round(e.ingresos[i]).toLocaleString('es-PY'):'<span class="null-val">sin datos</span>'}</td>
+  </tr>`).join('');
+  document.getElementById('detailTable').innerHTML=`<thead><tr><th>Período</th><th>Horas Tot.</th><th>Total Ingresos</th></tr></thead><tbody>${rows}</tbody>`;
+  if(modalChartInst){modalChartInst.destroy();}
+  const ctx=document.getElementById('modalChart').getContext('2d');
+  modalChartInst=new Chart(ctx,{type:'bar',data:{labels:PERIODOS,datasets:[
+    {label:'Ingresos (Gs.)',data:e.ingresos,backgroundColor:'rgba(232,197,71,.3)',borderColor:'#e8c547',borderWidth:2,type:'bar',yAxisID:'y'},
+    {label:'Horas',data:e.horas,borderColor:'#4fd1c5',backgroundColor:'rgba(79,209,197,0)',pointBackgroundColor:'#4fd1c5',pointRadius:5,borderWidth:2.5,tension:.4,type:'line',yAxisID:'y2',spanGaps:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#a0aec0',font:{size:11}}}},
+  scales:{
+    x:{ticks:{color:'#a0aec0'},grid:{color:'rgba(255,255,255,.05)'}},
+    y:{ticks:{color:'#e8c547',callback:v=>'Gs. '+(v/1000000).toFixed(1)+'M'},grid:{color:'rgba(255,255,255,.05)'},position:'left'},
+    y2:{ticks:{color:'#4fd1c5',callback:v=>v+'h'},grid:{display:false},position:'right'}
+  }}});
+  document.getElementById('modalOverlay').classList.add('open');
 }
 
-function sortTable(col) {
-  if(tblSortCol===col) tblSortDir=tblSortDir==='asc'?'desc':'asc';
-  else{tblSortCol=col;tblSortDir='desc';}
-  render();
-}
+document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('modalOverlay').classList.remove('open'));
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');});
+document.getElementById('searchInput').addEventListener('input',e=>{searchVal=e.target.value;buildCards();});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); activeFilter=btn.dataset.filter; buildCards();
+  });
+});
+document.getElementById('sortSelect').addEventListener('change',e=>{activeSort=e.target.value;buildCards();});
 
-/* ═══════════════════════════════ INIT ═══════════════════════════════ */
-buildPills();
-render();
+buildStats();
+buildCards();
 </script>
 </body>
 </html>
