@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evolución Guardias — Últimos 6 Meses</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --panel: #13161e;
+    --border: #1f2330;
+    --accent: #e8c547;
+    --accent2: #4fd1c5;
+    --red: #f56565;
+    --green: #68d391;
+    --text: #e2e8f0;
+    --muted: #718096;
+    --card: #181b25;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+  header {
+    background: linear-gradient(135deg, #13161e 0%, #1a1f2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header h1 { font-family:'Bebas Neue'; font-size:2.2rem; letter-spacing:3px; color:var(--accent); }
+  header p { color:var(--muted); font-size:.85rem; margin-top:2px; }
+  .badge { background:var(--accent); color:#000; font-size:.7rem; font-weight:600; padding:4px 10px; border-radius:20px; letter-spacing:1px; }
+
+  .controls {
+    padding: 20px 40px;
+    display: flex; flex-wrap:wrap; gap:12px; align-items:center;
+    border-bottom:1px solid var(--border);
+  }
+  .search-box {
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:8px 14px; color:var(--text); font-size:.85rem; font-family:'DM Sans';
+    outline:none; width:280px; transition:.2s;
+  }
+  .search-box:focus { border-color:var(--accent); }
+  .search-box::placeholder { color:var(--muted); }
+
+  .filter-btn {
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:8px 14px; border-radius:8px; cursor:pointer; font-family:'DM Sans'; font-size:.8rem;
+    transition:.2s; white-space:nowrap;
+  }
+  .filter-btn:hover, .filter-btn.active { background:var(--accent); color:#000; border-color:var(--accent); font-weight:600; }
+
+  .sort-label { color:var(--muted); font-size:.8rem; margin-left:8px; }
+  select.sort-select {
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    padding:8px 12px; border-radius:8px; font-family:'DM Sans'; font-size:.8rem; outline:none; cursor:pointer;
+  }
+
+  .stats-bar {
+    display:flex; gap:0; border-bottom:1px solid var(--border);
+    overflow-x:auto;
+  }
+  .stat { padding:16px 32px; border-right:1px solid var(--border); min-width:160px; }
+  .stat .val { font-family:'Bebas Neue'; font-size:1.8rem; color:var(--accent); letter-spacing:1px; }
+  .stat .lbl { font-size:.72rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+
+  .grid {
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+    gap:16px; padding:24px 40px;
+  }
+
+  .card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:20px; transition:.25s; cursor:pointer; position:relative; overflow:hidden;
+  }
+  .card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,.4); }
+  .card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .card.up::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .card.down::before { background: linear-gradient(90deg, var(--red), transparent); }
+  .card.neutral::before { background: linear-gradient(90deg, var(--muted), transparent); }
+
+  .card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+  .card-name { font-size:.9rem; font-weight:600; color:var(--text); line-height:1.3; max-width:260px; }
+  .var-badge {
+    font-size:.75rem; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; margin-left:8px;
+  }
+  .var-badge.up { background:rgba(104,211,145,.15); color:var(--green); }
+  .var-badge.down { background:rgba(245,101,101,.15); color:var(--red); }
+  .var-badge.neutral { background:rgba(113,128,150,.15); color:var(--muted); }
+
+  .mini-stats { display:flex; gap:20px; margin-bottom:14px; }
+  .mini-stat .ms-val { font-size:.85rem; font-weight:600; color:var(--accent2); }
+  .mini-stat .ms-lbl { font-size:.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+
+  .chart-wrap { position:relative; height:110px; }
+
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:100;
+    align-items:center; justify-content:center;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--panel); border:1px solid var(--border); border-radius:16px;
+    width:720px; max-width:95vw; padding:32px; position:relative;
+  }
+  .modal-close {
+    position:absolute; top:16px; right:16px; background:none; border:none;
+    color:var(--muted); font-size:1.4rem; cursor:pointer;
+  }
+  .modal-close:hover { color:var(--text); }
+  .modal h2 { font-family:'Bebas Neue'; font-size:1.5rem; letter-spacing:2px; color:var(--accent); margin-bottom:4px; }
+  .modal-chart-wrap { height:220px; margin:20px 0; }
+  .detail-table { width:100%; border-collapse:collapse; font-size:.8rem; }
+  .detail-table th { color:var(--muted); text-align:right; padding:6px 10px; font-weight:500; border-bottom:1px solid var(--border); }
+  .detail-table th:first-child { text-align:left; }
+  .detail-table td { text-align:right; padding:6px 10px; border-bottom:1px solid var(--border); }
+  .detail-table td:first-child { text-align:left; color:var(--accent2); font-weight:500; }
+  .detail-table tr:last-child td { border-bottom:none; }
+  .detail-table .null-val { color:var(--muted); font-style:italic; }
+
+  .empty { text-align:center; padding:60px; color:var(--muted); font-size:1rem; grid-column:1/-1; }
+
+  @media(max-width:600px){
+    header { padding:16px 20px; }
+    .controls, .grid { padding:16px 20px; }
+    .grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Evolución de Guardias</h1>
+    <p>Horas Totales e Ingresos — Últimos 6 meses</p>
+  </div>
+  <span class="badge">SEP 2025 → FEB 2026</span>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="controls">
+  <input class="search-box" type="text" id="searchInput" placeholder="🔍  Buscar guardia...">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="up">▲ Subió</button>
+  <button class="filter-btn" data-filter="down">▼ Bajó</button>
+  <button class="filter-btn" data-filter="stable">— Estable (±5%)</button>
+  <span class="sort-label">Ordenar por:</span>
+  <select class="sort-select" id="sortSelect">
+    <option value="nombre">Nombre A-Z</option>
+    <option value="var_desc">Mayor variación ↑</option>
+    <option value="var_asc">Menor variación ↓</option>
+    <option value="avg_desc">Ingreso promedio ↑</option>
+  </select>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2 id="modalName"></h2>
+    <p id="modalSub" style="color:var(--muted);font-size:.8rem;margin-bottom:4px;"></p>
+    <div class="modal-chart-wrap"><canvas id="modalChart"></canvas></div>
+    <table class="detail-table" id="detailTable"></table>
+  </div>
+</div>
+
+<script>
+const DATA = {"periodos":["SEP 2025","OCT 2025","NOV 2025","DIC 2025","ENE 2026","FEB 2026"],"personas":{"AVILIO ANDRES AVEIRO SOLIS":{"horas":[249.5,301.0,301.0,272.0,242.9,225.0],"ingresos":[4340172.0,5190547.0,5148647.0,4667517.0,4172418.0,3800487.0],"var_pct":-12.4,"avg_ing":4553298.0},"BLAS ANTONIO NUÑEZ OCAMPOS":{"horas":[146.0,215.5,132.0,166.0,192.0,232.0],"ingresos":[2210140.0,3331190.0,2014280.0,2527650.0,2979380.0,3501270.0],"var_pct":58.4,"avg_ing":2760652.0},"CHAVEZ MARTINEZ GUIDO JOEL":{"horas":[240.0,252.0,276.0,276.0,96.0,264.0],"ingresos":[3647505.0,3815385.0,4006192.0,4006192.0,1487992.0,3838312.0],"var_pct":5.2,"avg_ing":3466930.0},"CHIARA SALZA":{"horas":[null,null,null,84.0,96.0,72.0],"ingresos":[null,null,null,1175160.0,1343040.0,1007280.0],"var_pct":-14.3,"avg_ing":1175160.0},"DAISY EUGENIA GOMEZ COLMAN":{"horas":[240.0,240.0,264.0,null,null,null],"ingresos":[3357600.0,3357600.0,3693360.0,null,null,null],"var_pct":10.0,"avg_ing":3469520.0},"DENY GOMEZ":{"horas":[302.0,276.0,289.0,255.0,249.5,275.5],"ingresos":[5026065.0,4574335.0,4760395.0,4322445.0,4199410.0,4575720.0],"var_pct":-9.0,"avg_ing":4576395.0},"DIGNA CONCEPCION RUIZ":{"horas":[216.0,216.0,168.0,194.0,168.0,168.0],"ingresos":[3398940.0,3398940.0,2643620.0,3053450.0,2643620.0,2643620.0],"var_pct":-22.2,"avg_ing":2963698.0},"DUARTE SALDIVAR NELSON SILVESTRE":{"horas":[312.0,288.0,288.0,312.0,312.0,276.0],"ingresos":[5199485.0,4821825.0,4821825.0,5241385.0,5199485.0,4612045.0],"var_pct":-11.3,"avg_ing":4982675.0},"ELVIS FABIAN SALINAS ESPINOZA":{"horas":[null,13.0,12.0,34.0,null,null],"ingresos":[null,186060.0,167880.0,484040.0,null,null],"var_pct":160.2,"avg_ing":279327.0},"ELVIS SALINAS":{"horas":[null,null,null,null,null,9.5],"ingresos":[null,null,null,null,null,132905.0],"var_pct":null,"avg_ing":132905.0},"FERNANDEZ JARA JOSE MIGUEL":{"horas":[312.0,368.0,380.5,355.5,375.0,141.0],"ingresos":[4549240.0,5357820.0,5578785.0,5201800.0,5459940.0,2068960.0],"var_pct":-54.5,"avg_ing":4702758.0},"FRANCISCO MIGUEL PLATON":{"horas":[220.0,156.5,315.0,310.0,300.0,212.0],"ingresos":[3421380.0,2417790.0,4788140.0,4709810.0,4532200.0,3338790.0],"var_pct":-2.4,"avg_ing":3868018.0},"GERMAN OLMEDO AYALA":{"horas":[276.0,164.0,252.0,264.0,204.0,180.0],"ingresos":[3861240.0,2294360.0,3525480.0,3693360.0,2853960.0,2518200.0],"var_pct":-34.8,"avg_ing":3124433.0},"GONZALO GIMENEZ":{"horas":[3.5,null,null,null,null,null],"ingresos":[48965.0,null,null,null,null,null],"var_pct":null,"avg_ing":48965.0},"JULIO CESAR FERNANDEZ RODAS":{"horas":[267.5,390.0,351.5,288.0,360.0,288.0],"ingresos":[3972775.0,5833200.0,5294585.0,4280520.0,5413500.0,4364320.0],"var_pct":9.9,"avg_ing":4859817.0},"KAREN BURGOS":{"horas":[null,null,null,276.0,276.0,228.0],"ingresos":[null,null,null,3861240.0,3861240.0,3189720.0],"var_pct":-17.4,"avg_ing":3637400.0},"KAREN PEREIRA":{"horas":[null,null,null,null,132.0,null],"ingresos":[null,null,null,null,1846680.0,null],"var_pct":null,"avg_ing":1846680.0},"KARLOS PAREDES":{"horas":[null,null,null,156.0,220.0,176.0],"ingresos":[null,null,null,2308140.0,3287300.0,2634030.0],"var_pct":14.1,"avg_ing":2743157.0},"KEVIN GONZALEZ":{"horas":[null,null,168.5,168.0,204.0,240.0],"ingresos":[null,null,2357315.0,2350320.0,2853960.0,3357600.0],"var_pct":42.4,"avg_ing":2729799.0},"LOPEZ GUANES TALIA JAZMIN":{"horas":[217.5,240.0,205.0,216.0,204.0,240.0],"ingresos":[3187777.0,3502552.0,3012902.0,3166792.0,2998912.0,3544452.0],"var_pct":11.2,"avg_ing":3235564.0},"MARIO JOAQUIN ECHAGUE OJEDA":{"horas":[288.0,288.0,300.0,264.0,261.0,233.0],"ingresos":[4490020.0,4490020.0,4699800.0,4112360.0,4028490.0,3594870.0],"var_pct":-19.9,"avg_ing":4235927.0},"MARTINEZ CARBALLO DIEGO ANTONIO":{"horas":[300.0,324.0,285.5,300.0,172.0,276.0],"ingresos":[4811232.0,5138612.0,4558097.0,4802852.0,2802632.0,4425192.0],"var_pct":-8.0,"avg_ing":4423103.0},"MENDOZA BAEZ, MARIO ROBERTO":{"horas":[180.0,192.0,180.0,180.0,192.0,156.0],"ingresos":[2663152.0,2831032.0,2663152.0,2663152.0,2831032.0,2327392.0],"var_pct":-12.6,"avg_ing":2663152.0},"MIGUEL CARBALLO":{"horas":[126.0,138.0,109.0,66.0,null,null],"ingresos":[1905200.0,2110790.0,1696700.0,977810.0,null,null],"var_pct":-48.7,"avg_ing":1672625.0},"NATALIA VIVIANA TORRES BRITEZ":{"horas":[240.0,234.5,144.0,null,null,null],"ingresos":[3357600.0,3280655.0,2014560.0,null,null,null],"var_pct":-40.0,"avg_ing":2884272.0},"NELSON BAREIRO":{"horas":[235.5,361.5,254.0,166.5,219.5,272.0],"ingresos":[3319785.0,5155850.0,3607930.0,2373330.0,3070805.0,3838800.0],"var_pct":15.6,"avg_ing":3561083.0},"OCAMPO BRITEZ JOSE DAVID":{"horas":[216.5,252.5,180.5,206.0,203.0,216.0],"ingresos":[3368225.0,3955665.0,2814305.0,3221330.0,3175170.0,3398940.0],"var_pct":0.9,"avg_ing":3322272.0},"OSVALDO AGUILAR":{"horas":[null,null,null,24.0,12.0,31.0],"ingresos":[null,null,null,335760.0,167880.0,446260.0],"var_pct":32.9,"avg_ing":316633.0},"PAOLA ELIZABETH GAYOSO CABRERA":{"horas":[255.5,216.0,252.0,298.0,217.0,201.0],"ingresos":[4077245.0,3398940.0,3902580.0,4625730.0,3454830.0,3184900.0],"var_pct":-21.9,"avg_ing":3774038.0},"PAVON MENDEZ ROCIO ELIZABETH":{"horas":[214.5,240.0,204.0,192.0,240.0,192.0],"ingresos":[3481007.0,3879652.0,3334112.0,3124332.0,3879652.0,3166232.0],"var_pct":-9.0,"avg_ing":3477498.0},"PEDRO ARGUELLO":{"horas":[null,null,193.0,204.0,252.0,216.0],"ingresos":[null,null,2700070.0,2853960.0,3525480.0,3021840.0],"var_pct":11.9,"avg_ing":3025338.0},"PEDRO PEREZ":{"horas":[null,null,null,214.0,307.0,239.0],"ingresos":[null,null,null,3215930.0,4336830.0,3435790.0],"var_pct":6.8,"avg_ing":3662850.0},"PEÑA VERA JULIO CESAR":{"horas":[312.0,311.0,312.0,305.0,303.0,288.0],"ingresos":[4909580.0,4895590.0,4909580.0,4993520.0,4741770.0,4531920.0],"var_pct":-7.7,"avg_ing":4830327.0},"RICARDO GOMEZ":{"horas":[180.0,180.0,180.0,204.0,180.0,180.0],"ingresos":[2518200.0,2518200.0,2518200.0,2853960.0,2518200.0,2518200.0],"var_pct":0.0,"avg_ing":2574160.0},"RICHARD RAFAEL GUERRERO FERNANDEZ":{"horas":[322.5,246.0,264.0,84.0,300.0,288.0],"ingresos":[5113437.0,3963592.0,4215412.0,1445812.0,4760952.0,4593072.0],"var_pct":-10.2,"avg_ing":4015380.0},"RODRIGO AGÜERO":{"horas":[232.0,280.0,228.0,161.0,224.0,259.8],"ingresos":[3262440.0,3929770.0,3384952.0,2451812.0,3339467.0,3984864.0],"var_pct":22.1,"avg_ing":3392218.0},"ROISA JARA":{"horas":[null,null,null,null,null,12.0],"ingresos":[null,null,null,null,null,167880.0],"var_pct":null,"avg_ing":167880.0},"SAMUEL RAMON MONTIEL VERON":{"horas":[240.0,312.0,240.0,204.0,228.0,204.0],"ingresos":[3734700.0,4867680.0,3692800.0,3189160.0,3524920.0,3189160.0],"var_pct":-14.6,"avg_ing":3699737.0},"SANDOVAL CHAPARRO GUSTAVO RAUL":{"horas":[120.0,96.0,96.0,120.0,96.0,96.0],"ingresos":[2077130.0,1661704.0,1661704.0,2077130.0,1661704.0,1661704.0],"var_pct":-20.0,"avg_ing":1800179.0},"SANTOS BENITEZ EDGAR BIENVENIDO":{"horas":[309.0,371.0,400.0,334.0,369.0,323.0],"ingresos":[4507270.0,5403980.0,5872540.0,4852830.0,5430470.0,4707320.0],"var_pct":4.4,"avg_ing":5129068.0},"VALDEZ LARROSA BLAS ANTONIO":{"horas":[328.0,380.0,362.0,380.0,364.0,287.0],"ingresos":[4928110.0,5714250.0,5412150.0,5714250.0,5821420.0,4291670.0],"var_pct":-12.9,"avg_ing":5313642.0}}};
+
+const PERIODOS = DATA.periodos;
+const PERSONAS = DATA.personas;
+
+function fmt(n){ if(n===null||n===undefined) return 'Gs. —'; return 'Gs. ' + Math.round(n).toLocaleString('es-PY'); }
+function fmtH(n){ if(n===null||n===undefined) return '—'; return n.toFixed(1) + ' h'; }
+function getClass(v){ if(v===null||v===undefined) return 'neutral'; if(v>5) return 'up'; if(v<-5) return 'down'; return 'neutral'; }
+
+function buildStats(){
+  const all = Object.values(PERSONAS);
+  const withVar = all.filter(p=>p.var_pct!==null);
+  const ups = withVar.filter(p=>p.var_pct>5).length;
+  const downs = withVar.filter(p=>p.var_pct<-5).length;
+  const stable = withVar.filter(p=>Math.abs(p.var_pct)<=5).length;
+  const totalAvg = all.reduce((s,p)=>s+p.avg_ing,0)/all.length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="val">${all.length}</div><div class="lbl">Total Guardias</div></div>
+    <div class="stat"><div class="val" style="color:var(--green)">${ups}</div><div class="lbl">Con Incremento</div></div>
+    <div class="stat"><div class="val" style="color:var(--red)">${downs}</div><div class="lbl">Con Baja</div></div>
+    <div class="stat"><div class="val" style="color:var(--muted)">${stable}</div><div class="lbl">Estables (±5%)</div></div>
+    <div class="stat"><div class="val">Gs. ${(totalAvg/1000000).toFixed(1)}M</div><div class="lbl">Ingreso Prom. General</div></div>`;
+}
+
+let activeFilter='all', activeSort='nombre', searchVal='';
+let miniCharts={};
+
+function buildCards(){
+  Object.values(miniCharts).forEach(c=>c.destroy()); miniCharts={};
+  let entries = Object.entries(PERSONAS).map(([k,v])=>({name:k,...v}));
+  if(searchVal) entries=entries.filter(e=>e.name.toLowerCase().includes(searchVal.toLowerCase()));
+  if(activeFilter==='up') entries=entries.filter(e=>e.var_pct!==null&&e.var_pct>5);
+  if(activeFilter==='down') entries=entries.filter(e=>e.var_pct!==null&&e.var_pct<-5);
+  if(activeFilter==='stable') entries=entries.filter(e=>e.var_pct!==null&&Math.abs(e.var_pct)<=5);
+  if(activeSort==='nombre') entries.sort((a,b)=>a.name.localeCompare(b.name));
+  if(activeSort==='var_desc') entries.sort((a,b)=>(b.var_pct||0)-(a.var_pct||0));
+  if(activeSort==='var_asc') entries.sort((a,b)=>(a.var_pct||0)-(b.var_pct||0));
+  if(activeSort==='avg_desc') entries.sort((a,b)=>b.avg_ing-a.avg_ing);
+
+  const grid=document.getElementById('grid');
+  if(!entries.length){grid.innerHTML='<div class="empty">No se encontraron guardias con los filtros aplicados.</div>';return;}
+
+  grid.innerHTML=entries.map(e=>{
+    const cls=getClass(e.var_pct);
+    const varStr=e.var_pct===null?'Sin datos suficientes':(e.var_pct>0?'+':'')+e.var_pct+'%';
+    const ingValid=e.ingresos.filter(x=>x!==null);
+    const hValid=e.horas.filter(x=>x!==null);
+    const lastIng=ingValid[ingValid.length-1];
+    const lastH=hValid[hValid.length-1];
+    const safeId='c_'+e.name.replace(/[^a-zA-Z0-9]/g,'_');
+    return `<div class="card ${cls}" data-name="${e.name}">
+      <div class="card-header">
+        <div class="card-name">${e.name}</div>
+        <span class="var-badge ${cls}">${varStr}</span>
+      </div>
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="ms-val">${fmt(lastIng)}</div><div class="ms-lbl">Último ingreso</div></div>
+        <div class="mini-stat"><div class="ms-val">${fmtH(lastH)}</div><div class="ms-lbl">Últimas horas</div></div>
+        <div class="mini-stat"><div class="ms-val">Gs. ${(e.avg_ing/1000000).toFixed(1)}M</div><div class="ms-lbl">Prom. ingreso</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="${safeId}"></canvas></div>
+    </div>`;
+  }).join('');
+
+  entries.forEach(e=>{
+    const safeId='c_'+e.name.replace(/[^a-zA-Z0-9]/g,'_');
+    const canvas=document.getElementById(safeId); if(!canvas) return;
+    const chart=new Chart(canvas,{type:'line',data:{labels:PERIODOS,datasets:[
+      {label:'Ingresos',data:e.ingresos,borderColor:'#e8c547',backgroundColor:'rgba(232,197,71,.08)',pointBackgroundColor:'#e8c547',pointRadius:3,borderWidth:2,tension:.4,yAxisID:'y',spanGaps:false},
+      {label:'Horas',data:e.horas,borderColor:'#4fd1c5',backgroundColor:'rgba(79,209,197,.05)',pointBackgroundColor:'#4fd1c5',pointRadius:3,borderWidth:1.5,tension:.4,yAxisID:'y2',spanGaps:false,borderDash:[4,3]}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},
+    scales:{x:{ticks:{color:'#718096',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{display:false},y2:{display:false}}}});
+    miniCharts[safeId]=chart;
+  });
+
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click',()=>openModal(card.dataset.name));
+  });
+}
+
+let modalChartInst=null;
+function openModal(name){
+  const e=PERSONAS[name];
+  document.getElementById('modalName').textContent=name;
+  const cls=getClass(e.var_pct);
+  const varStr=e.var_pct===null?'Sin variación calculable':(e.var_pct>0?'▲ Incremento de +':'▼ Baja de ')+Math.abs(e.var_pct)+'% (primer al último mes con datos)';
+  document.getElementById('modalSub').textContent=varStr;
+  const rows=PERIODOS.map((p,i)=>`<tr>
+    <td>${p}</td>
+    <td>${e.horas[i]!==null?e.horas[i].toFixed(1)+' h':'<span class="null-val">sin datos</span>'}</td>
+    <td>${e.ingresos[i]!==null?'Gs. '+Math.round(e.ingresos[i]).toLocaleString('es-PY'):'<span class="null-val">sin datos</span>'}</td>
+  </tr>`).join('');
+  document.getElementById('detailTable').innerHTML=`<thead><tr><th>Período</th><th>Horas Tot.</th><th>Total Ingresos</th></tr></thead><tbody>${rows}</tbody>`;
+  if(modalChartInst){modalChartInst.destroy();}
+  const ctx=document.getElementById('modalChart').getContext('2d');
+  modalChartInst=new Chart(ctx,{type:'bar',data:{labels:PERIODOS,datasets:[
+    {label:'Ingresos (Gs.)',data:e.ingresos,backgroundColor:'rgba(232,197,71,.3)',borderColor:'#e8c547',borderWidth:2,type:'bar',yAxisID:'y'},
+    {label:'Horas',data:e.horas,borderColor:'#4fd1c5',backgroundColor:'rgba(79,209,197,0)',pointBackgroundColor:'#4fd1c5',pointRadius:5,borderWidth:2.5,tension:.4,type:'line',yAxisID:'y2',spanGaps:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#a0aec0',font:{size:11}}}},
+  scales:{
+    x:{ticks:{color:'#a0aec0'},grid:{color:'rgba(255,255,255,.05)'}},
+    y:{ticks:{color:'#e8c547',callback:v=>'Gs. '+(v/1000000).toFixed(1)+'M'},grid:{color:'rgba(255,255,255,.05)'},position:'left'},
+    y2:{ticks:{color:'#4fd1c5',callback:v=>v+'h'},grid:{display:false},position:'right'}
+  }}});
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('modalOverlay').classList.remove('open'));
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');});
+document.getElementById('searchInput').addEventListener('input',e=>{searchVal=e.target.value;buildCards();});
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); activeFilter=btn.dataset.filter; buildCards();
+  });
+});
+document.getElementById('sortSelect').addEventListener('change',e=>{activeSort=e.target.value;buildCards();});
+
+buildStats();
+buildCards();
+</script>
+</body>
+</html>
