@@ -232,7 +232,7 @@ let charts = {};
 
 /* ═══════════════════════════════ HELPERS ═══════════════════════════════ */
 const fmt = n => n==null?'—':new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(n);
-const fmtM = n => n==null?'—':'Gs '+(n/1e6).toFixed(2)+'M';
+const fmtM = n => n==null?'—':'Gs '+new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(n);
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
 function getActivePeriodos() {
@@ -341,7 +341,7 @@ function updateHeaderStats(list) {
   document.getElementById('s-up').textContent = list.filter(p=>p._d.varPct>0).length;
   document.getElementById('s-down').textContent = list.filter(p=>p._d.varPct<0).length;
   const tot = list.reduce((s,p)=>s+p._d.totalIng,0);
-  document.getElementById('s-ing').textContent = (tot/1e9).toFixed(2)+'B';
+  document.getElementById('s-ing').textContent = 'Gs '+new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(tot);
 }
 
 /* ═══════════════════════════════ VIEW SWITCH ═══════════════════════════════ */
@@ -386,7 +386,7 @@ function renderCards(list) {
       if(!m) return `<div class="sp-cell empty"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">—</div><div class="sp-ing">—</div><div class="bar-bg"></div></div>`;
       const pct=Math.round((m.ingresos/globalMax)*100);
       const bc=d.varPct>=0?'#4fffb0':'#ff6b6b';
-      return `<div class="sp-cell"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">${m.htt}h</div><div class="sp-ing">${(m.ingresos/1e6).toFixed(2)}M</div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${bc}"></div></div></div>`;
+      return `<div class="sp-cell"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">${m.htt}h</div><div class="sp-ing">Gs ${new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(m.ingresos)}</div><div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${bc}"></div></div></div>`;
     }).join('');
 
     return `<div class="card" id="${id}" onclick="toggleCard('${id}')">
@@ -482,7 +482,7 @@ function renderTable(list) {
     const d=p._d;
     const mesCells=active.map(per=>{
       const m=p.meses[per];
-      return m?`<td>${(m.ingresos/1e6).toFixed(2)}M</td>`:`<td style="color:var(--muted2)">—</td>`;
+      return m?`<td>Gs ${new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(m.ingresos)}</td>`:`<td style="color:var(--muted2)">—</td>`;
     }).join('');
     const vc=d.varPct>0?'up':d.varPct<0?'down':'';
     const vs=d.varPct===0?'—':(d.varPct>0?'+':'')+d.varPct+'%';
@@ -502,7 +502,7 @@ function renderTable(list) {
   const sumHtt=sorted.reduce((s,p)=>s+p._d.totalHtt,0);
   const mesTotals=active.map(per=>{
     const t=sorted.reduce((s,p)=>s+(p.meses[per]?.ingresos??0),0);
-    return `<td>${(t/1e6).toFixed(1)}M</td>`;
+    return `<td>Gs ${new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(t)}</td>`;
   }).join('');
   tbl.querySelector('tfoot').innerHTML=`<tr>
     <td>TOTALES (${sorted.length} guardias)</td>
