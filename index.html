@@ -163,6 +163,10 @@ tfoot td:first-child{text-align:left;color:var(--muted);font-size:10px;text-tran
     <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     Resumen tabla
   </button>
+  <button class="vbtn" id="btn-rol" onclick="switchView('rol')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="13" width="7" height="5" rx="1"/><rect x="14" y="13" width="7" height="5" rx="1"/></svg>
+    Por Rol
+  </button>
   <div class="vbar-sep"></div>
   <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace" id="sel-info">Todos los meses seleccionados</span>
 </div>
@@ -211,6 +215,11 @@ tfoot td:first-child{text-align:left;color:var(--muted);font-size:10px;text-tran
   <div id="table-view" style="display:none">
     <div class="tbl-wrap"><table id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
     <div class="empty-msg" id="empty-tbl" style="display:none">Sin resultados.</div>
+  </div>
+  <!-- ROL VIEW -->
+  <div id="rol-view" style="display:none">
+    <div class="cards-grid" id="rol-grid"></div>
+    <div class="empty-msg" id="empty-rol" style="display:none">Sin resultados para los meses seleccionados.</div>
   </div>
 </div>
 
@@ -349,8 +358,10 @@ function switchView(v) {
   currentView = v;
   document.getElementById('btn-cards').classList.toggle('active',v==='cards');
   document.getElementById('btn-table').classList.toggle('active',v==='table');
+  document.getElementById('btn-rol').classList.toggle('active',v==='rol');
   document.getElementById('cards-view').style.display = v==='cards'?'':'none';
   document.getElementById('table-view').style.display = v==='table'?'block':'none';
+  document.getElementById('rol-view').style.display   = v==='rol'?'block':'none';
   render();
 }
 
@@ -361,7 +372,8 @@ function render() {
   rcount.innerHTML = `Mostrando <span>${list.length}</span> de ${RAW.personas.length} guardias &nbsp;·&nbsp; ${selectedMonths.size} meses seleccionados`;
   updateHeaderStats(list);
   if(currentView==='cards') renderCards(list);
-  else renderTable(list);
+  else if(currentView==='table') renderTable(list);
+  else if(currentView==='rol') renderRol();
 }
 
 /* ═══════════════════════════════ CARDS ═══════════════════════════════ */
@@ -523,6 +535,138 @@ function sortTable(col) {
 /* ═══════════════════════════════ INIT ═══════════════════════════════ */
 buildPills();
 render();
+
+/* ══════════════════════════════ ROL DATA & LOGIC ══════════════════════════════ */
+const ROL_RAW = {"periodos": ["2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02"], "roles": [{"rol": "ATEN. DOM - SC", "meses": {"2026-01": {"label": "ENERO 2026", "htt": 146.5, "hd": 143.0, "hn": 3.5, "ingresos": 2064200, "neto": 2064200, "guardias": 3}, "2026-02": {"label": "FEBRERO 2026", "htt": 139.5, "hd": 138.5, "hn": 1.0, "ingresos": 1955795, "neto": 1840210, "guardias": 3}}}, {"rol": "MD - AUTO CON CHOFER", "meses": {"2025-09": {"label": "SEPTIEMBRE 2025", "htt": 203.5, "hd": 187.5, "hn": 16.0, "ingresos": 2914005, "neto": 2914005, "guardias": 6}, "2025-10": {"label": "OCTUBRE 2025", "htt": 302.5, "hd": 276.0, "hn": 26.5, "ingresos": 4343010, "neto": 4026145, "guardias": 7}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 261.0, "hd": 240.0, "hn": 21.0, "ingresos": 3739380, "neto": 3423447, "guardias": 4}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 235.5, "hd": 216.0, "hn": 19.5, "ingresos": 3376350, "neto": 3156205, "guardias": 5}}}, {"rol": "MD ASUNCION", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 368.0, "hd": 346.0, "hn": 22.0, "ingresos": 5070600, "neto": 4755600, "guardias": 4}, "2025-02": {"label": "FEBRERO 2025", "htt": 328.0, "hd": 308.0, "hn": 20.0, "ingresos": 4509000, "neto": 4509000, "guardias": 4}, "2025-03": {"label": "MARZO 2025", "htt": 342.0, "hd": 320.0, "hn": 22.0, "ingresos": 4846015, "neto": 4216015, "guardias": 4}, "2025-04": {"label": "ABRIL 2025", "htt": 342.0, "hd": 321.0, "hn": 21.0, "ingresos": 4702050, "neto": 4627732, "guardias": 5}, "2025-05": {"label": "MAYO 2025", "htt": 340.0, "hd": 320.0, "hn": 20.0, "ingresos": 4671000, "neto": 4041000, "guardias": 5}, "2025-06": {"label": "JUNIO 2025", "htt": 370.0, "hd": 347.0, "hn": 23.0, "ingresos": 5272670, "neto": 5200652, "guardias": 5}, "2025-07": {"label": "JULIO 2025", "htt": 370.0, "hd": 347.0, "hn": 23.0, "ingresos": 5272670, "neto": 5272670, "guardias": 5}, "2025-08": {"label": "AGOSTO 2025", "htt": 340.0, "hd": 320.0, "hn": 20.0, "ingresos": 4840400, "neto": 4840400, "guardias": 4}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 342.0, "hd": 321.0, "hn": 21.0, "ingresos": 4872570, "neto": 4872570, "guardias": 4}, "2025-10": {"label": "OCTUBRE 2025", "htt": 370.0, "hd": 347.0, "hn": 23.0, "ingresos": 5272670, "neto": 5218656, "guardias": 4}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 340.0, "hd": 320.0, "hn": 20.0, "ingresos": 4840400, "neto": 4525400, "guardias": 4}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 338.0, "hd": 319.0, "hn": 19.0, "ingresos": 4808230, "neto": 4421212, "guardias": 5}, "2026-01": {"label": "ENERO 2026", "htt": 368.0, "hd": 346.0, "hn": 22.0, "ingresos": 5240500, "neto": 5240500, "guardias": 6}, "2026-02": {"label": "FEBRERO 2026", "htt": 326.8, "hd": 306.8, "hn": 20.0, "ingresos": 4655732, "neto": 3953714, "guardias": 5}}}, {"rol": "MD AUTO", "meses": {"2026-01": {"label": "ENERO 2026", "htt": 193.5, "hd": 193.5, "hn": 0.0, "ingresos": 2707065, "neto": 2707065, "guardias": 5}, "2026-02": {"label": "FEBRERO 2026", "htt": 251.5, "hd": 233.5, "hn": 18.0, "ingresos": 3593905, "neto": 3543668, "guardias": 8}}}, {"rol": "MD LUQUE", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 384.0, "hd": 338.0, "hn": 46.0, "ingresos": 5370300, "neto": 4771111, "guardias": 3}, "2025-02": {"label": "FEBRERO 2025", "htt": 432.0, "hd": 380.0, "hn": 52.0, "ingresos": 6042600, "neto": 5653282, "guardias": 4}, "2025-03": {"label": "MARZO 2025", "htt": 476.0, "hd": 419.0, "hn": 57.0, "ingresos": 6656850, "neto": 6341850, "guardias": 4}, "2025-04": {"label": "ABRIL 2025", "htt": 448.0, "hd": 394.0, "hn": 54.0, "ingresos": 6266700, "neto": 5562382, "guardias": 4}, "2025-05": {"label": "MAYO 2025", "htt": 465.0, "hd": 408.0, "hn": 57.0, "ingresos": 6508350, "neto": 6193350, "guardias": 4}, "2025-06": {"label": "JUNIO 2025", "htt": 480.0, "hd": 422.0, "hn": 58.0, "ingresos": 6958220, "neto": 5590268, "guardias": 4}, "2025-07": {"label": "JULIO 2025", "htt": 480.0, "hd": 422.0, "hn": 58.0, "ingresos": 6958220, "neto": 5590268, "guardias": 4}, "2025-08": {"label": "AGOSTO 2025", "htt": 476.0, "hd": 419.0, "hn": 57.0, "ingresos": 6898070, "neto": 5753072, "guardias": 5}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 436.0, "hd": 383.0, "hn": 53.0, "ingresos": 6321710, "neto": 5376710, "guardias": 4}, "2025-10": {"label": "OCTUBRE 2025", "htt": 481.0, "hd": 422.0, "hn": 59.0, "ingresos": 6976400, "neto": 6031400, "guardias": 5}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 460.0, "hd": 405.0, "hn": 55.0, "ingresos": 6665850, "neto": 6035850, "guardias": 3}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 460.5, "hd": 408.0, "hn": 52.5, "ingresos": 6662370, "neto": 6014742, "guardias": 4}, "2026-01": {"label": "ENERO 2026", "htt": 462.9, "hd": 407.9, "hn": 55.0, "ingresos": 6706421, "neto": 6706421, "guardias": 5}, "2026-02": {"label": "FEBRERO 2026", "htt": 431.0, "hd": 379.0, "hn": 52.0, "ingresos": 6247570, "neto": 6007429, "guardias": 6}}}, {"rol": "PETROPAR", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 1440.0, "hd": 1440.0, "hn": 0.0, "ingresos": 20419405, "neto": 18710053, "guardias": 8}, "2025-02": {"label": "FEBRERO 2025", "htt": 1344.0, "hd": 1344.0, "hn": 0.0, "ingresos": 19123405, "neto": 17460880, "guardias": 9}, "2025-03": {"label": "MARZO 2025", "htt": 1488.0, "hd": 1488.0, "hn": 0.0, "ingresos": 20367830, "neto": 18651606, "guardias": 7}, "2025-04": {"label": "ABRIL 2025", "htt": 1440.0, "hd": 1440.0, "hn": 0.0, "ingresos": 19440000, "neto": 17480425, "guardias": 9}, "2025-05": {"label": "MAYO 2025", "htt": 1476.0, "hd": 1476.0, "hn": 0.0, "ingresos": 20345745, "neto": 18674805, "guardias": 8}, "2025-06": {"label": "JUNIO 2025", "htt": 1488.0, "hd": 1488.0, "hn": 0.0, "ingresos": 21251977, "neto": 19390260, "guardias": 8}, "2025-07": {"label": "JULIO 2025", "htt": 1488.0, "hd": 1488.0, "hn": 0.0, "ingresos": 21251977, "neto": 19390260, "guardias": 8}, "2025-08": {"label": "AGOSTO 2025", "htt": 1483.0, "hd": 1483.0, "hn": 0.0, "ingresos": 21182027, "neto": 19005310, "guardias": 7}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 1440.0, "hd": 1440.0, "hn": 0.0, "ingresos": 20580457, "neto": 18879765, "guardias": 8}, "2025-10": {"label": "OCTUBRE 2025", "htt": 1478.5, "hd": 1478.5, "hn": 0.0, "ingresos": 21119072, "neto": 19522191, "guardias": 9}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 1440.0, "hd": 1440.0, "hn": 0.0, "ingresos": 20435504, "neto": 18855918, "guardias": 10}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 1488.0, "hd": 1488.0, "hn": 0.0, "ingresos": 21107024, "neto": 19823132, "guardias": 12}, "2026-01": {"label": "ENERO 2026", "htt": 1488.0, "hd": 1488.0, "hn": 0.0, "ingresos": 21107024, "neto": 19427922, "guardias": 11}, "2026-02": {"label": "FEBRERO 2026", "htt": 1344.0, "hd": 1344.0, "hn": 0.0, "ingresos": 19092464, "neto": 17583838, "guardias": 11}}}, {"rol": "PUNTA ASUNCION", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 746.0, "hd": 433.0, "hn": 313.0, "ingresos": 11758396, "neto": 10546289, "guardias": 6}, "2025-02": {"label": "FEBRERO 2025", "htt": 672.0, "hd": 392.0, "hn": 280.0, "ingresos": 10625746, "neto": 9326452, "guardias": 6}, "2025-03": {"label": "MARZO 2025", "htt": 742.5, "hd": 432.5, "hn": 310.0, "ingresos": 11559080, "neto": 10347646, "guardias": 7}, "2025-04": {"label": "ABRIL 2025", "htt": 720.0, "hd": 420.0, "hn": 300.0, "ingresos": 11214830, "neto": 10307810, "guardias": 6}, "2025-05": {"label": "MAYO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11439415, "neto": 10612220, "guardias": 6}, "2025-06": {"label": "JUNIO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11852412, "neto": 10625444, "guardias": 6}, "2025-07": {"label": "JULIO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11852412, "neto": 10484460, "guardias": 6}, "2025-08": {"label": "AGOSTO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11852412, "neto": 10769443, "guardias": 6}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 720.0, "hd": 420.0, "hn": 300.0, "ingresos": 11474752, "neto": 10541612, "guardias": 5}, "2025-10": {"label": "OCTUBRE 2025", "htt": 744.5, "hd": 434.5, "hn": 310.0, "ingresos": 11714455, "neto": 11082123, "guardias": 5}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 720.0, "hd": 420.0, "hn": 300.0, "ingresos": 11474752, "neto": 10591464, "guardias": 5}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 737.0, "hd": 434.0, "hn": 303.0, "ingresos": 11936352, "neto": 11155285, "guardias": 7}, "2026-01": {"label": "ENERO 2026", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11707460, "neto": 11707460, "guardias": 7}, "2026-02": {"label": "FEBRERO 2026", "htt": 672.0, "hd": 392.0, "hn": 280.0, "ingresos": 10719432, "neto": 9919485, "guardias": 7}}}, {"rol": "PUNTA SAN LORENZO", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 648.0, "hd": 378.0, "hn": 270.0, "ingresos": 10092115, "neto": 9741184, "guardias": 7}, "2025-02": {"label": "FEBRERO 2025", "htt": 672.0, "hd": 392.0, "hn": 280.0, "ingresos": 10491715, "neto": 9809873, "guardias": 5}, "2025-03": {"label": "MARZO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 11585215, "neto": 11226475, "guardias": 5}, "2025-04": {"label": "ABRIL 2025", "htt": 720.0, "hd": 420.0, "hn": 300.0, "ingresos": 11397080, "neto": 10830575, "guardias": 6}, "2025-05": {"label": "MAYO 2025", "htt": 743.0, "hd": 433.0, "hn": 310.0, "ingresos": 11571715, "neto": 11064339, "guardias": 7}, "2025-06": {"label": "JUNIO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 12041242, "neto": 11175429, "guardias": 8}, "2025-07": {"label": "JULIO 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 12041242, "neto": 11244395, "guardias": 8}, "2025-08": {"label": "AGOSTO 2025", "htt": 744.0, "hd": 432.5, "hn": 311.5, "ingresos": 13507602, "neto": 12765489, "guardias": 9}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 720.0, "hd": 418.0, "hn": 302.0, "ingresos": 11816914, "neto": 11186524, "guardias": 7}, "2025-10": {"label": "OCTUBRE 2025", "htt": 744.0, "hd": 434.0, "hn": 310.0, "ingresos": 12293381, "neto": 11394831, "guardias": 8}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 721.5, "hd": 421.5, "hn": 300.0, "ingresos": 11791753, "neto": 11278731, "guardias": 7}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 744.0, "hd": 424.0, "hn": 320.0, "ingresos": 12228094, "neto": 11720022, "guardias": 9}, "2026-01": {"label": "ENERO 2026", "htt": 744.0, "hd": 430.0, "hn": 314.0, "ingresos": 12020236, "neto": 10421926, "guardias": 8}, "2026-02": {"label": "FEBRERO 2026", "htt": 672.0, "hd": 392.0, "hn": 280.0, "ingresos": 11160401, "neto": 10398223, "guardias": 9}}}, {"rol": "SANTA CLARA (ATTE.DOM)", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 169.0, "hd": 169.0, "hn": 0.0, "ingresos": 2281500, "neto": 2281500, "guardias": 1}, "2025-02": {"label": "FEBRERO 2025", "htt": 156.0, "hd": 156.0, "hn": 0.0, "ingresos": 2106000, "neto": 2106000, "guardias": 3}, "2025-03": {"label": "MARZO 2025", "htt": 156.0, "hd": 156.0, "hn": 0.0, "ingresos": 2106000, "neto": 1791000, "guardias": 4}, "2025-04": {"label": "ABRIL 2025", "htt": 156.0, "hd": 156.0, "hn": 0.0, "ingresos": 2385830, "neto": 2311512, "guardias": 3}, "2025-05": {"label": "MAYO 2025", "htt": 154.0, "hd": 154.0, "hn": 0.0, "ingresos": 2079000, "neto": 2035364, "guardias": 1}, "2025-06": {"label": "JUNIO 2025", "htt": 166.0, "hd": 166.0, "hn": 0.0, "ingresos": 2322340, "neto": 2255674, "guardias": 1}, "2025-07": {"label": "JULIO 2025", "htt": 166.0, "hd": 166.0, "hn": 0.0, "ingresos": 2322340, "neto": 2255674, "guardias": 1}, "2025-08": {"label": "AGOSTO 2025", "htt": 156.0, "hd": 156.0, "hn": 0.0, "ingresos": 2182440, "neto": 1722601, "guardias": 1}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 144.0, "hd": 144.0, "hn": 0.0, "ingresos": 2014560, "neto": 1592190, "guardias": 1}, "2025-10": {"label": "OCTUBRE 2025", "htt": 182.0, "hd": 182.0, "hn": 0.0, "ingresos": 2546180, "neto": 2224651, "guardias": 1}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 156.0, "hd": 144.0, "hn": 12.0, "ingresos": 2377672, "neto": 2084906, "guardias": 1}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 122.0, "hd": 117.0, "hn": 5.0, "ingresos": 1872682, "neto": 1716253, "guardias": 3}}}, {"rol": "T.B.R. 1", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 1333.5, "hd": 783.5, "hn": 550.0, "ingresos": 20789411, "neto": 19286407, "guardias": 11}, "2025-02": {"label": "FEBRERO 2025", "htt": 1344.0, "hd": 784.0, "hn": 560.0, "ingresos": 20971661, "neto": 17613596, "guardias": 12}, "2025-03": {"label": "MARZO 2025", "htt": 1477.0, "hd": 857.0, "hn": 620.0, "ingresos": 22590415, "neto": 21403781, "guardias": 12}, "2025-04": {"label": "ABRIL 2025", "htt": 1392.0, "hd": 812.0, "hn": 580.0, "ingresos": 21420830, "neto": 19913032, "guardias": 10}, "2025-05": {"label": "MAYO 2025", "htt": 1392.5, "hd": 812.5, "hn": 580.0, "ingresos": 21427580, "neto": 19639167, "guardias": 10}, "2025-06": {"label": "JUNIO 2025", "htt": 1488.0, "hd": 868.0, "hn": 620.0, "ingresos": 23559872, "neto": 21471625, "guardias": 8}, "2025-07": {"label": "JULIO 2025", "htt": 1488.0, "hd": 868.0, "hn": 620.0, "ingresos": 24139682, "neto": 21595451, "guardias": 8}, "2025-08": {"label": "AGOSTO 2025", "htt": 1423.5, "hd": 823.0, "hn": 600.5, "ingresos": 22968699, "neto": 21387803, "guardias": 14}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 1430.0, "hd": 831.0, "hn": 599.0, "ingresos": 23385224, "neto": 21168967, "guardias": 9}, "2025-10": {"label": "OCTUBRE 2025", "htt": 1488.0, "hd": 868.0, "hn": 620.0, "ingresos": 24284634, "neto": 22198014, "guardias": 11}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 1444.0, "hd": 844.0, "hn": 600.0, "ingresos": 23585274, "neto": 21361941, "guardias": 9}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 1392.0, "hd": 812.0, "hn": 580.0, "ingresos": 22773994, "neto": 20439468, "guardias": 14}, "2026-01": {"label": "ENERO 2026", "htt": 1440.0, "hd": 840.0, "hn": 600.0, "ingresos": 23674266, "neto": 21309046, "guardias": 10}, "2026-02": {"label": "FEBRERO 2026", "htt": 1344.0, "hd": 784.0, "hn": 560.0, "ingresos": 22018674, "neto": 19875880, "guardias": 11}}}, {"rol": "T.B.R. 2", "meses": {"2025-11": {"label": "NOVIEMBRE 2025", "htt": 482.0, "hd": 482.0, "hn": 0.0, "ingresos": 6743180, "neto": 6124270, "guardias": 6}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 480.0, "hd": 480.0, "hn": 0.0, "ingresos": 6715200, "neto": 6036343, "guardias": 7}, "2026-01": {"label": "ENERO 2026", "htt": 504.0, "hd": 504.0, "hn": 0.0, "ingresos": 7050960, "neto": 6409153, "guardias": 3}, "2026-02": {"label": "FEBRERO 2026", "htt": 480.0, "hd": 480.0, "hn": 0.0, "ingresos": 6715200, "neto": 6088782, "guardias": 4}}}, {"rol": "T.B.R. 3", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 526.5, "hd": 526.5, "hn": 0.0, "ingresos": 7251525, "neto": 7188959, "guardias": 9}, "2025-02": {"label": "FEBRERO 2025", "htt": 463.0, "hd": 463.0, "hn": 0.0, "ingresos": 6259950, "neto": 5770355, "guardias": 10}, "2025-03": {"label": "MARZO 2025", "htt": 502.0, "hd": 502.0, "hn": 0.0, "ingresos": 6916915, "neto": 6667840, "guardias": 9}, "2025-04": {"label": "ABRIL 2025", "htt": 480.0, "hd": 480.0, "hn": 0.0, "ingresos": 6619915, "neto": 6401215, "guardias": 6}, "2025-05": {"label": "MAYO 2025", "htt": 454.0, "hd": 454.0, "hn": 0.0, "ingresos": 6268915, "neto": 5961924, "guardias": 7}, "2025-06": {"label": "JUNIO 2025", "htt": 552.0, "hd": 552.0, "hn": 0.0, "ingresos": 7867432, "neto": 7265520, "guardias": 6}, "2025-07": {"label": "JULIO 2025", "htt": 552.0, "hd": 552.0, "hn": 0.0, "ingresos": 7867432, "neto": 7265520, "guardias": 6}, "2025-08": {"label": "AGOSTO 2025", "htt": 494.0, "hd": 494.0, "hn": 0.0, "ingresos": 7056012, "neto": 6658172, "guardias": 10}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 562.0, "hd": 560.0, "hn": 2.0, "ingresos": 8015712, "neto": 7368759, "guardias": 7}, "2025-10": {"label": "OCTUBRE 2025", "htt": 552.0, "hd": 552.0, "hn": 0.0, "ingresos": 7867432, "neto": 7565248, "guardias": 8}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 482.0, "hd": 482.0, "hn": 0.0, "ingresos": 6888132, "neto": 6630016, "guardias": 7}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 480.0, "hd": 480.0, "hn": 0.0, "ingresos": 6860152, "neto": 6404777, "guardias": 6}, "2026-01": {"label": "ENERO 2026", "htt": 504.0, "hd": 504.0, "hn": 0.0, "ingresos": 7340864, "neto": 5905631, "guardias": 6}, "2026-02": {"label": "FEBRERO 2026", "htt": 480.0, "hd": 480.0, "hn": 0.0, "ingresos": 6860152, "neto": 6205809, "guardias": 7}}}, {"rol": "T.B.R. 4", "meses": {"2025-01": {"label": "ENERO 2025", "htt": 1188.0, "hd": 728.0, "hn": 460.0, "ingresos": 18040915, "neto": 16055311, "guardias": 7}, "2025-02": {"label": "FEBRERO 2025", "htt": 1055.0, "hd": 655.0, "hn": 400.0, "ingresos": 16002415, "neto": 15133693, "guardias": 8}, "2025-03": {"label": "MARZO 2025", "htt": 1128.0, "hd": 698.0, "hn": 430.0, "ingresos": 17109415, "neto": 14047191, "guardias": 14}, "2025-04": {"label": "ABRIL 2025", "htt": 1098.0, "hd": 678.0, "hn": 420.0, "ingresos": 16943745, "neto": 14037756, "guardias": 8}, "2025-05": {"label": "MAYO 2025", "htt": 1126.0, "hd": 706.0, "hn": 420.0, "ingresos": 17321745, "neto": 14540797, "guardias": 13}, "2025-06": {"label": "JUNIO 2025", "htt": 1190.0, "hd": 762.0, "hn": 428.0, "ingresos": 19021229, "neto": 14121554, "guardias": 9}, "2025-07": {"label": "JULIO 2025", "htt": 1190.0, "hd": 762.0, "hn": 428.0, "ingresos": 17636995, "neto": 13997728, "guardias": 9}, "2025-08": {"label": "AGOSTO 2025", "htt": 1123.5, "hd": 705.0, "hn": 418.5, "ingresos": 16860912, "neto": 14004037, "guardias": 9}, "2025-09": {"label": "SEPTIEMBRE 2025", "htt": 1104.0, "hd": 684.0, "hn": 420.0, "ingresos": 17349712, "neto": 14401604, "guardias": 8}, "2025-10": {"label": "OCTUBRE 2025", "htt": 1200.0, "hd": 740.0, "hn": 460.0, "ingresos": 18860352, "neto": 15765412, "guardias": 7}, "2025-11": {"label": "NOVIEMBRE 2025", "htt": 1080.0, "hd": 680.0, "hn": 400.0, "ingresos": 16930152, "neto": 13406427, "guardias": 8}, "2025-12": {"label": "DICIEMBRE 2025", "htt": 1056.0, "hd": 656.0, "hn": 400.0, "ingresos": 16594392, "neto": 13548110, "guardias": 9}, "2026-01": {"label": "ENERO 2026", "htt": 1176.0, "hd": 736.0, "hn": 440.0, "ingresos": 18585744, "neto": 14820871, "guardias": 10}, "2026-02": {"label": "FEBRERO 2026", "htt": 1056.0, "hd": 656.0, "hn": 400.0, "ingresos": 16594392, "neto": 13459807, "guardias": 8}}}]};
+let rolCharts = {};
+
+function getActivePeriodosRol() { return getActivePeriodos(); }
+
+function getRolAgg(r) {
+  const active = getActivePeriodos();
+  const vals = active.map(p => r.meses[p]).filter(Boolean);
+  if (!vals.length) return null;
+  const totalIng  = vals.reduce((s,v)=>s+v.ingresos,0);
+  const totalNeto = vals.reduce((s,v)=>s+v.neto,0);
+  const totalHtt  = vals.reduce((s,v)=>s+v.htt,0);
+  const maxGuard  = Math.max(...vals.map(v=>v.guardias));
+  const withData  = active.filter(p=>r.meses[p]);
+  let varPct = 0;
+  if (withData.length >= 2) {
+    const first = r.meses[withData[0]].ingresos;
+    const last  = r.meses[withData[withData.length-1]].ingresos;
+    varPct = first>0 ? Math.round((last-first)/first*1000)/10 : 0;
+  }
+  return {totalIng,totalNeto,totalHtt,varPct,monthsCount:vals.length,maxGuard};
+}
+
+function renderRol() {
+  Object.values(rolCharts).forEach(c=>c.destroy()); rolCharts={};
+  const grid  = document.getElementById('rol-grid');
+  const empty = document.getElementById('empty-rol');
+  const active = getActivePeriodos();
+
+  const list = ROL_RAW.roles
+    .map(r => { const d=getRolAgg(r); return d ? {...r,_d:d} : null; })
+    .filter(Boolean);
+
+  if (!list.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  let globalMax=0;
+  ROL_RAW.roles.forEach(r=>active.forEach(p=>{
+    const v=r.meses[p]?.ingresos??0; if(v>globalMax)globalMax=v;
+  }));
+
+  const fmtGs = n => 'Gs '+new Intl.NumberFormat('es-PY',{maximumFractionDigits:0}).format(n);
+
+  grid.innerHTML = list.map(r => {
+    const d=r._d;
+    const rid = 'rol-'+slug(r.rol);
+    const vc  = d.varPct>0?'b-up':d.varPct<0?'b-down':'b-neutral';
+    const vs  = d.varPct===0?'—':(d.varPct>0?'+':'')+d.varPct+'%';
+
+    const cells = active.map((p,i) => {
+      const m=r.meses[p]; const idx=ALL_PERIODOS.indexOf(p);
+      if(!m) return `<div class="sp-cell empty"><div class="sp-lbl">${ALL_LABELS[idx]}</div><div class="sp-htt">—</div><div class="sp-ing">—</div><div class="bar-bg"></div></div>`;
+      const pct=globalMax>0?Math.round((m.ingresos/globalMax)*100):0;
+      const bc=d.varPct>=0?'#4fffb0':'#ff6b6b';
+      return `<div class="sp-cell">
+        <div class="sp-lbl">${ALL_LABELS[idx]}</div>
+        <div class="sp-htt">${m.htt}h · ${m.guardias} gds</div>
+        <div class="sp-ing">${fmtGs(m.ingresos)}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${bc}"></div></div>
+      </div>`;
+    }).join('');
+
+    return `<div class="card" id="${rid}" onclick="toggleRolCard('${rid}')">
+      <div class="card-hdr"><div class="card-name">${r.rol}</div><span class="badge ${vc}">${vs}</span></div>
+      <div class="card-spark">${cells}</div>
+      <div class="card-detail" onclick="event.stopPropagation()">
+        <div class="det-stats">
+          <div class="dstat"><div class="dstat-val">${fmtGs(d.totalIng)}</div><div class="dstat-lbl">Total Ingresos</div></div>
+          <div class="dstat"><div class="dstat-val">${fmtGs(d.totalNeto)}</div><div class="dstat-lbl">Total Neto</div></div>
+          <div class="dstat"><div class="dstat-val">${d.totalHtt.toFixed(0)}h</div><div class="dstat-lbl">Total Horas</div></div>
+          <div class="dstat"><div class="dstat-val">${d.maxGuard}</div><div class="dstat-lbl">Máx. guardias/mes</div></div>
+        </div>
+        <div class="det-tabs">
+          <button class="dtab active" data-t="ingresos" onclick="swRolTab('${rid}','ingresos')">Ingresos</button>
+          <button class="dtab" data-t="neto" onclick="swRolTab('${rid}','neto')">Neto</button>
+          <button class="dtab" data-t="horas" onclick="swRolTab('${rid}','horas')">Horas</button>
+          <button class="dtab" data-t="guardias" onclick="swRolTab('${rid}','guardias')">Guardias</button>
+        </div>
+        <div class="chart-wrap"><canvas></canvas></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleRolCard(id) {
+  const card=document.getElementById(id); if(!card)return;
+  const was=card.classList.contains('expanded');
+  document.querySelectorAll('#rol-grid .card.expanded').forEach(c=>{
+    c.classList.remove('expanded');
+    if(rolCharts[c.id]){rolCharts[c.id].destroy();delete rolCharts[c.id];}
+  });
+  if(!was){card.classList.add('expanded');drawRolChart(id,'ingresos');}
+}
+
+function swRolTab(id,tab) {
+  const card=document.getElementById(id);
+  card.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  card.querySelector(`.dtab[data-t="${tab}"]`).classList.add('active');
+  if(rolCharts[id]){rolCharts[id].destroy();delete rolCharts[id];}
+  drawRolChart(id,tab);
+}
+
+function drawRolChart(id,tab) {
+  const card=document.getElementById(id); if(!card)return;
+  const rolSlug=id.replace('rol-','');
+  const r=ROL_RAW.roles.find(x=>slug(x.rol)===rolSlug); if(!r)return;
+  const active=getActivePeriodos();
+  const labels=active.map(p=>ALL_LABELS[ALL_PERIODOS.indexOf(p)]);
+  const vals=active.map(p=>{
+    const m=r.meses[p]; if(!m)return null;
+    return tab==='horas'?m.htt:tab==='neto'?m.neto:tab==='guardias'?m.guardias:m.ingresos;
+  });
+  const color=tab==='horas'?'#f7c948':tab==='neto'?'#a78bfa':tab==='guardias'?'#60a5fa':'#4fffb0';
+  const lbl=tab==='horas'?'Horas':tab==='neto'?'Neto':tab==='guardias'?'Guardias':'Total Ingresos';
+  const isH=tab==='horas', isG=tab==='guardias';
+  rolCharts[id]=new Chart(card.querySelector('canvas').getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[{label:lbl,data:vals,borderColor:color,backgroundColor:color+'18',
+      borderWidth:2,pointBackgroundColor:color,pointRadius:4,fill:true,tension:.35,spanGaps:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1f2e',borderColor:'#252d3d',
+        borderWidth:1,titleColor:'#e8eaf0',bodyColor:'#6b7494',padding:10,
+        callbacks:{label:c=>isH?c.parsed.y+'h':isG?c.parsed.y+' guardias':'Gs '+fmt(c.parsed.y)}}},
+      scales:{
+        x:{grid:{color:'#1e2535'},ticks:{color:'#6b7494',font:{family:'DM Mono',size:9}}},
+        y:{grid:{color:'#1e2535'},ticks:{color:'#6b7494',font:{family:'DM Mono',size:9},
+          callback:v=>isH?v+'h':isG?v:(v/1e6).toFixed(1)+'M'}}}}
+  });
+}
+
 </script>
 </body>
 </html>
